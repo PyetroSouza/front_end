@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --primary-color: #F9F9F9;
+}
+
+
+body {
+    background-color: var(--primary-color);
+    padding-top: 19px;
+}
+
+header {
+    width: 100vw;
+    height: 67px;
+    background: linear-gradient(to right, #1C86BF, #4EA8D8);
+    border-radius: 15px;
+    color: #FFFFFF;
+}
+
+
+.cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 21px;
+}
+
+
+.logo_app {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 19px;
+    font-family: "Inter", sans-serif
+}
+
+.logo_app img {
+    width: 30px;
+    height: 30px;
+}
+
+.logo_app h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.logo_app span {
+    color: #00C897;
+}
+
+.data_hora {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+
+}
+
+.data_hora h2 {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.perfil {
+    display: flex;
+    align-items: center;
+    padding-right: 43px;
+    gap: 8px;
+}
+
+.perfil .foto_perfil {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background-color: #374151;
+    border-radius: 50px;
+}
+
+.perfil .foto_perfil .nome_perfil {
+    font-size: 16px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+}
+
+.perfil .dados {
+    display: flex;
+    flex-direction: column;
+}
+
+.perfil .dados .nome {
+    font-size: 12px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+}
+
+.perfil .dados .email {
+    font-size: 10px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: #E0E0E0;
+}
+
+.card_boas_vindas {
+    width: 100vw;
+    height: 126px;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to right, #009951, #1C86BF, #4EA8D8);
+    border-radius: 15px;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.card_boas_vindas .bem_vindo {
+    padding-left: 59px;
+    font-family: "Inter", sans-serif;
+}
+
+.bem_vindo h1 {
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+}
+
+.bem_vindo h2 {
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+}
+
+.botoes_idoso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-right: 68px;
+}
+
+.botoes_idoso .adicionar,
+.cadastrar {
+    display: flex;
+    align-items: center;
+    width: 164px;
+    height: 38px;
+    border: 1px solid #F9F9F9;
+    border-radius: 15px;
+    gap: 10px;
+
+}
+
+.botoes_idoso .adicionar h1 {
+    font-size: 12px;
+    font-weight: 300;
+    font-family: 'Inter', sans-serif;
+}
+
+.botoes_idoso .cadastrar h1 {
+    font-size: 12px;
+    font-weight: 300;
+    font-family: 'Inter', sans-serif;
+}
+
+
+.botoes_idoso .adicionar,
+.cadastrar img {
+    padding-left: 10px;
+}
+
+.search {
+    width: 100vw;
+    height: 47px;
+    display: flex;
+    align-items: center;
+    border: 2px solid #98989842;
+    border-radius: 25px;
+    margin-left: 19px;
+    margin-right: 43px;
+}
+
+.buscar {
+    display: flex;
+    align-items: center;
+    width: 1218px;
+    height: 27px;
+    border: 1px solid #D9D9D9;
+    border-radius: 20px;
+}
+
+.buscar h1 {
+    padding-left: 15px;
+    color: #666666;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.search img {
+    padding: 10px 25px 10px 15px;
+}
+
+main{
+    display: flex;
+    background-color: #009951;
+}
+
+.cards{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.cards .pacientes_ativos, .alertas{
+    width: 595.07px;
+    height: 147px;
+    border: 2px solid #98989842;
+} 
