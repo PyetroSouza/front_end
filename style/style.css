@@ -25,7 +25,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 21px;
+    margin-bottom: 21px;
 }
 
 
@@ -180,15 +180,17 @@ header {
     border-radius: 25px;
     margin-left: 19px;
     margin-right: 43px;
+    padding-right: 15px;
 }
 
 .buscar {
     display: flex;
     align-items: center;
-    width: 1218px;
+    width: 100vw;
     height: 27px;
     border: 1px solid #D9D9D9;
     border-radius: 20px;
+
 }
 
 .buscar h1 {
@@ -205,13 +207,17 @@ header {
 
 main{
     display: flex;
-    background-color: #009951;
+    align-items: center;
+    justify-content: center;
+    padding-top: 243px;
 }
 
 .cards{
     display: flex;
     align-items: center;
     flex-direction: row;
+    width: 1300px;
+    height: 147px;
     justify-content: space-between;
 }
 
@@ -219,4 +225,36 @@ main{
     width: 595.07px;
     height: 147px;
     border: 2px solid #98989842;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 } 
+
+.pacientes_ativos .numero_pacientes{
+    font-size: 64px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    color: #009951;
+}
+
+.pacientes_ativos .pacientes_ativos{
+    font-size: 20px;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    color: #009951;
+}
+
+.alertas .numero_alerta{
+    font-size: 64px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    color: #B32D34;
+}
+
+.alertas .alertas_pendentes{
+    font-size: 20px;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    color: #B32D34;
+}
