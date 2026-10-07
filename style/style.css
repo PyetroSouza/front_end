@@ -8,24 +8,27 @@
 
 
 body {
+    display: flex;
+    flex-direction: column;
     background-color: var(--primary-color);
     padding-top: 19px;
+    max-width: 96%;
+    margin: 0 auto;
 }
 
 header {
-    width: 100vw;
-    height: 67px;
-    background: linear-gradient(to right, #1C86BF, #4EA8D8);
-    border-radius: 15px;
-    color: #FFFFFF;
+    width: 100%;
 }
-
 
 .cabecalho {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 21px;
+    height: 67px;                                   /* veio do header */
+    background: linear-gradient(to right, #1C86BF, #4EA8D8);
+    border-radius: 15px;
+    color: #FFFFFF;
 }
 
 
@@ -96,6 +99,7 @@ header {
     font-size: 12px;
     font-weight: 400;
     font-family: 'Roboto', sans-serif;
+    color: #E0E0E0;
 }
 
 .perfil .dados .email {
@@ -106,7 +110,7 @@ header {
 }
 
 .card_boas_vindas {
-    width: 100vw;
+    width: 100%;
     height: 126px;
     display: flex;
     align-items: center;
@@ -119,6 +123,7 @@ header {
 .card_boas_vindas .bem_vindo {
     padding-left: 59px;
     font-family: "Inter", sans-serif;
+    color: #FFFFFF;
 }
 
 .bem_vindo h1 {
@@ -139,10 +144,11 @@ header {
     justify-content: center;
     gap: 12px;
     padding-right: 68px;
+    color: #FFFFFF;
 }
 
 .botoes_idoso .adicionar,
-.cadastrar {
+.botoes_idoso .cadastrar {
     display: flex;
     align-items: center;
     width: 164px;
@@ -150,7 +156,7 @@ header {
     border: 1px solid #F9F9F9;
     border-radius: 15px;
     gap: 10px;
-
+    padding-left: 10px;
 }
 
 .botoes_idoso .adicionar h1 {
@@ -172,21 +178,19 @@ header {
 }
 
 .search {
-    width: 100vw;
-    height: 47px;
     display: flex;
     align-items: center;
+    height: 47px;
     border: 2px solid #98989842;
     border-radius: 25px;
-    margin-left: 19px;
-    margin-right: 43px;
     padding-right: 15px;
+    margin-bottom: 25px;     
 }
 
 .buscar {
     display: flex;
     align-items: center;
-    width: 100vw;
+    width: 100%;
     height: 27px;
     border: 1px solid #D9D9D9;
     border-radius: 20px;
@@ -205,56 +209,141 @@ header {
     padding: 10px 25px 10px 15px;
 }
 
-main{
+.container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 243px;
+    flex-direction: column;
+    gap: 25px;
 }
 
-.cards{
+.resumo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;                 
+}
+
+.card_resumo {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    flex-direction: row;
-    width: 1300px;
+    justify-content: center;
     height: 147px;
+    border: 2px solid #98989842;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+}
+
+.resumo_numero {
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    font-weight: 400;
+}
+
+.resumo_texto {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.card_ativos { color: #009951; }
+.card_alertas { color: #B32D34; }
+
+
+.lista_pacientes {
+    display: grid;
+    grid-template-columns: repeat(3, 390px);
+    gap: 24px;
     justify-content: space-between;
 }
 
-.cards .pacientes_ativos, .alertas{
-    width: 595.07px;
-    height: 147px;
-    border: 2px solid #98989842;
+.card_paciente {
+    box-sizing: border-box;         
+    width: 390px;
+    height: 162px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    grid-template-rows: 1fr auto;   
+    column-gap: 12px;
+    background-color: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-family: 'Roboto', sans-serif;
+
+}
+
+.avatar {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    color: #FFFFFF;
+    font-size: 24px;
+}
+
+.avatar,
+.info {
+    align-self: center;
+}
+
+.info {
+    display: flex;
     flex-direction: column;
-} 
-
-.pacientes_ativos .numero_pacientes{
-    font-size: 64px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    color: #009951;
+    gap: 4px;
+    padding-left: 35px;
 }
 
-.pacientes_ativos .pacientes_ativos{
-    font-size: 20px;
-    font-family: "Inter", sans-serif;
+.idade {
+    margin-bottom: 0;   
+}
+
+.avatar_verde   { background-color: #009951; }
+.avatar_azul    { background-color: #1C6EA4; }
+.avatar_laranja { background-color: #E07B54; }
+
+
+.nome {
+    font-size: 16px;
     font-weight: 500;
-    color: #009951;
+    color: #1F2937;
 }
 
-.alertas .numero_alerta{
-    font-size: 64px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    color: #B32D34;
+.idade {
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #6B7280;
 }
 
-.alertas .alertas_pendentes{
-    font-size: 20px;
-    font-family: "Inter", sans-serif;
-    font-weight: 500;
-    color: #B32D34;
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+}
+
+.tags li {
+    padding: 2px 8px;
+    border-radius: 6px;
+    background-color: #D6DCF5;
+    color: #3F4A8A;
+    font-size: 10px;
+}
+
+
+.proximo_remedio {
+    grid-column: 1 / -1;         
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.proximo_remedio img {
+    width: 16px;
+    height: 16px;
 }
