@@ -1,0 +1,73 @@
+
+.card-boas-vindas {
+  width: 100%;
+  height: 126px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  background: linear-gradient(to right, #009951, #1C86BF, #4EA8D8);
+  border-radius: 15px;
+}
+
+.texto-boas-vindas {
+  padding-left: 59px;
+  font-family: "Inter", sans-serif;
+  color: #FFFFFF;
+}
+
+.texto-boas-vindas h1 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.texto-boas-vindas h2 {
+    margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.botoes-idoso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-right: 68px;
+  color: #FFFFFF;
+}
+
+.botoes-idoso .botao-adicionar,
+.botoes-idoso .botao-cadastrar {
+  display: flex;
+  align-items: center;
+  width: 164px;
+  height: 38px;
+  gap: 10px;
+  padding-left: 10px;
+  border: 1px solid #F9F9F9;
+  border-radius: 15px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.botoes-idoso .botao-adicionar img,
+.botoes-idoso .botao-cadastrar img {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.botoes-idoso .botao-adicionar span,
+.botoes-idoso .botao-cadastrar span {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+.botoes-idoso button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+

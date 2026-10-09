@@ -1,0 +1,109 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.logo-app h1 {
+    margin: 0;
+}
+
+.data-hora h2 {
+    margin: 0;
+}
+
+.foto-perfil h2 {
+    margin: 0;
+}
+
+.dados-perfil p {
+    margin: 0;
+}
+
+
+.cabecalho-original {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 67px;
+    margin-bottom: 21px;
+    background: linear-gradient(to right, #1C86BF, #4EA8D8);
+    border-radius: 15px;
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.logo-app {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 19px;
+    font-family: "Inter", sans-serif;
+}
+
+.logo-app img {
+    width: 30px;
+    height: 30px;
+}
+
+.logo-app h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.logo-app span {
+    color: #00C897;
+}
+
+.data-hora {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+}
+
+.data-hora h2 {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.perfil {
+    display: flex;
+    align-items: center;
+    padding-right: 43px;
+    gap: 8px;
+}
+
+.perfil .foto-perfil {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background-color: #374151;
+    border-radius: 50px;
+}
+
+.perfil .foto-perfil h2 {
+    font-size: 16px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+}
+
+.perfil .dados-perfil {
+    display: flex;
+    flex-direction: column;
+}
+
+.perfil .dados-perfil .nome-perfil {
+    font-size: 12px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: #E0E0E0;
+}
+
+.perfil .dados-perfil .email-perfil {
+    font-size: 10px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: #E0E0E0;
+}
