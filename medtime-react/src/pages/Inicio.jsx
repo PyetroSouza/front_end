@@ -3,7 +3,7 @@ import BoasVindas from '../components/BoasVindas.jsx'
 import Buscar from '../components/Buscar.jsx'
 import './Inicio.css'
 
-function Inicio({ aoCadastrar, busca, setBusca }) {
+function Inicio({ aoCadastrar, busca, setBusca, abrirDashboard }) {
   return (
     <>
       <BoasVindas aoCadastrar={aoCadastrar} />
@@ -62,7 +62,10 @@ function Inicio({ aoCadastrar, busca, setBusca }) {
             </p>
           </article>
 
-          <article className="card_paciente">
+          <article className="card_paciente" onClick={() => abrirDashboard({
+            nome: 'Ana Maria De Jesus',
+            idade: 78
+          })}>
             <div className="avatar avatar_verde">AM</div>
 
             <div className="info">
