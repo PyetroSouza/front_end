@@ -37,6 +37,7 @@ function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado }) {
                     </button>
                 </div>
             </section>
+            
         </>
     )
 }
