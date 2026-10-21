@@ -6,8 +6,8 @@ import Pacientes from './pages/Pacientes.jsx'
 import Cabecalho from './components/Cabecalho.jsx'
 import DashboardPaciente from './pages/DashboardPaciente.jsx'
 import CadastroRemedio from './pages/CadastroRemedio.jsx'
+import { Toaster } from 'sonner'
 import './App.css'
-
 
 
 function App() {
@@ -20,10 +20,26 @@ function App() {
     setPacienteSelecionado(null)
   }
 
+  function voltarParaDashboard() {
+    setTelaAtual('dashboard')
+  }
+
+  function irParaCadastroRemedio() {
+    setTelaAtual("cadastro-remedio")
+  }
+
+
   return (
     <div className="aplicacao">
       <Cabecalho />
 
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        duration={4000}
+      />
+      
       <main className="conteudo">
         {telaAtual === 'inicio' && (
           <Inicio
@@ -43,9 +59,15 @@ function App() {
 
         {telaAtual === 'pacientes' && <Pacientes />}
 
-        {telaAtual === 'dashboard' && <DashboardPaciente pacienteSelecionado={pacienteSelecionado}
-          setPacienteSelecionado={setPacienteSelecionado} v
-          voltarParaInicio={voltarParaInicio} />}
+        {telaAtual === 'dashboard' && (<DashboardPaciente
+          pacienteSelecionado={pacienteSelecionado}
+          setPacienteSelecionado={setPacienteSelecionado}
+          voltarParaInicio={voltarParaInicio}
+          aoClicarCadastrarRemedio={irParaCadastroRemedio}
+        />)}
+        {telaAtual === 'cadastro-remedio' && (
+          <CadastroRemedio voltarParaDashboard={voltarParaDashboard} />
+        )}
       </main>
     </div>
   )

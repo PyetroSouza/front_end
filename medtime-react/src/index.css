@@ -18,12 +18,12 @@
 
 body {
   background-color: #F9F9F9;
-  padding-top: 19px;
+  padding-top: 10px;
   width: 96%;
   margin: 0 auto;
 }
 
 #root {
   width: 100%;
-  min-height: calc(100vh - 19px);
+  min-height: calc(100vh - 10px);
 }

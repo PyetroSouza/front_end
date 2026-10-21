@@ -1,6 +1,6 @@
 import './DashboardPaciente.css'
 
-function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltarParaInicio}) {
+function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio}) {
     return (
         <div className="dashboard-conteudo">
             <section className="card-boas-vindas-paciente">
@@ -28,7 +28,7 @@ function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltar
                         </div>
                     </div>
 
-                    <button type='button' className='botao-medicamento'>
+                    <button type='button' className='botao-medicamento' onClick={aoClicarCadastrarRemedio}>
                         <img src="/assets/cadastrar.svg" alt="adicionar medicamento" />
                        Adicionar Medicamento
                     </button>
