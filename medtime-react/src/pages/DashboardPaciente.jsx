@@ -1,6 +1,15 @@
 import './DashboardPaciente.css'
+import { gerarIniciais } from '../utils/gerarIniciais.js'
+import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
+import { medicamentos } from '../data/medicamentos.js'
 
-function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio}) {
+
+function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio }) {
+    const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
+    const medicamentosDoPaciente = medicamentos.filter(
+        (medicamento) => medicamento.id_paciente === pacienteSelecionado?.id
+    )
+
     return (
         <div className="dashboard-conteudo">
             <section className="card-boas-vindas-paciente">
@@ -14,8 +23,14 @@ function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltar
 
                 <div className="card-conteudo-principal">
                     <div className="info-perfil">
-                        <div className="foto-perfil">
-                            <h2>AM</h2>
+                        <div
+                            className="foto-perfil"
+                            style={{
+                                backgroundColor: corAvatar.fundo,
+                                color: corAvatar.texto
+                            }}
+                        >
+                            <h2>{gerarIniciais(pacienteSelecionado?.nome)}</h2>
                         </div>
                         <div className='dados-texto'>
                             <h3 className="nome">{pacienteSelecionado?.nome || "Ana Maria De Jesus"}</h3>
@@ -30,7 +45,7 @@ function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltar
 
                     <button type='button' className='botao-medicamento' onClick={aoClicarCadastrarRemedio}>
                         <img src="/assets/cadastrar.svg" alt="adicionar medicamento" />
-                       Adicionar Medicamento
+                        Adicionar Medicamento
                     </button>
                 </div>
             </section>
@@ -88,45 +103,41 @@ function DashboardPaciente({ pacienteSelecionado, setPacienteSelecionado, voltar
                             </div>
                         </div>
                         <div className="container-remedios">
-                            <div className="remedio">
-                                <div className="info-esquerda">
-                                    <img src="/assets/remedio.svg" alt="simbolo remedio" />
-                                    <div className="nome-quantidade">
-                                        <span>Omeprazol 100mg</span>
-                                        <p>2 comprimidos</p>
+                            {medicamentosDoPaciente.length === 0 ? (
+                                <p className="sem-medicamentos">
+                                    Nenhum medicamento cadastrado para este paciente.
+                                </p>
+                            ) : (
+                                medicamentosDoPaciente.map((medicamento) => (
+                                    <div
+                                        className="remedio"
+                                        key={medicamento.id_medicamento}
+                                    >
+                                        <div className="info-esquerda">
+                                            <img
+                                                src="/assets/remedio.svg"
+                                                alt="Símbolo de medicamento"
+                                            />
+
+                                            <div className="nome-quantidade">
+                                                <span>
+                                                    {medicamento.nome} {medicamento.concentracao}{medicamento.sigla}
+                                                </span>
+
+                                                <p>
+                                                    {medicamento.quantidade_dose} {medicamento.tipo_dosagem}
+                                                    {medicamento.quantidade_dose > 1 ? 's' : ''}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="tempo-remedio">
+                                            <h1>{medicamento.proximo_horario}</h1>
+                                            <p>Horário previsto</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="tempo-remedio">
-                                    <h1>16:40</h1>
-                                    <p>faltam 4 min</p>
-                                </div>
-                            </div>
-                            <div className="remedio">
-                                <div className="info-esquerda">
-                                    <img src="/assets/remedio.svg" alt="simbolo remedio" />
-                                    <div className="nome-quantidade">
-                                        <span>Omeprazol 100mg</span>
-                                        <p>2 comprimidos</p>
-                                    </div>
-                                </div>
-                                <div className="tempo-remedio">
-                                    <h1>16:40</h1>
-                                    <p>faltam 4 min</p>
-                                </div>
-                            </div>
-                            <div className="remedio">
-                                <div className="info-esquerda">
-                                    <img src="/assets/remedio.svg" alt="simbolo remedio" />
-                                    <div className="nome-quantidade">
-                                        <span>Omeprazol 100mg</span>
-                                        <p>2 comprimidos</p>
-                                    </div>
-                                </div>
-                                <div className="tempo-remedio">
-                                    <h1>16:40</h1>
-                                    <p>faltam 4 min</p>
-                                </div>
-                            </div>
+                                ))
+                            )}
                         </div>
                     </div>
 
