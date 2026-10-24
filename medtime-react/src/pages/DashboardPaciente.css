@@ -423,3 +423,153 @@
     margin: 0;
     color: #4EA8D8;
 }
+
+@media (max-width: 1024px) {
+    .dashboard-inferior-grid {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .contato-de-emergencia {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .conteudo-principal-direita {
+        width: 100%;
+        align-items: stretch;
+        gap: 24px;
+        min-width: 0;
+    }
+
+    .dados-pulseira {
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .temperatura,
+    .frequencia-cardiaca,
+    .pressao-sanguinea {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        padding: 20px;
+    }
+
+    .dados-pulseira span {
+        font-size: 32px;
+    }
+
+    .dados-pulseira p {
+        font-size: 14px;
+    }
+
+    .proximos-medicamentos-placeholder {
+        width: 100%;
+    }
+
+    .remedio {
+        width: calc(100% - 32px);
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-conteudo {
+        padding: 12px 0;
+    }
+
+    .card-boas-vindas-paciente {
+        height: auto;
+        padding: 16px;
+        gap: 20px;
+    }
+
+    .botao-voltar {
+        margin: 0;
+    }
+
+    .card-conteudo-principal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .info-perfil {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .dados-texto {
+        min-width: 0;
+    }
+
+    .tags {
+        flex-wrap: wrap;
+    }
+
+    .botao-medicamento {
+        width: 100%;
+        margin: 0;
+    }
+
+    .dados-pulseira {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .temperatura,
+    .frequencia-cardiaca,
+    .pressao-sanguinea {
+        width: 100%;
+        min-height: 110px;
+        padding: 20px;
+    }
+
+    .header-proximos-medicamentos {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px 16px;
+    }
+
+    .proximos-remedios {
+        padding-left: 0;
+    }
+
+    .menu-medicamentos {
+        padding-right: 0;
+    }
+
+    .container-remedios {
+        padding: 0 12px 20px;
+    }
+
+    .remedio {
+        width: 100%;
+        max-width: 100%;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .info-esquerda {
+        padding-left: 0;
+        gap: 8px;
+    }
+
+    .nome-quantidade span {
+        font-size: 14px;
+    }
+
+    .tempo-remedio {
+        padding-right: 0;
+    }
+
+    .tempo-remedio h1 {
+        font-size: 16px;
+    }
+
+    .tempo-remedio p {
+        font-size: 11px;
+    }
+}

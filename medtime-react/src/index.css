@@ -16,11 +16,12 @@
 
 
 
+
 body {
   background-color: #F9F9F9;
-  padding-top: 10px;
-  width: 96%;
-  margin: 0 auto;
+  margin: 0;
+  padding: 10px 2% 0;
+  width: 100%;
 }
 
 #root {
