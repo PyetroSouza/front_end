@@ -7,6 +7,7 @@ import Cabecalho from './components/Cabecalho.jsx'
 import DashboardPaciente from './pages/DashboardPaciente.jsx'
 import CadastroRemedio from './pages/CadastroRemedio.jsx'
 import { Toaster } from 'sonner'
+import { medicamentos as medicamentosIniciais } from './data/medicamentos'
 import './App.css'
 
 
@@ -14,6 +15,9 @@ function App() {
   const [telaAtual, setTelaAtual] = useState('inicio')
   const [busca, setBusca] = useState('')
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null)
+  const [listaMedicamentos, setListaMedicamentos] = useState(
+    () => [...medicamentosIniciais]
+  )
 
   function voltarParaInicio() {
     setTelaAtual('inicio')
@@ -28,6 +32,12 @@ function App() {
     setTelaAtual("cadastro-remedio")
   }
 
+  function cadastrarMedicamento(novoMedicamento) {
+    setListaMedicamentos((listaAnterior) => [
+      ...listaAnterior,
+      novoMedicamento
+    ])
+  }
 
   return (
     <div className="aplicacao">
@@ -39,14 +49,14 @@ function App() {
         closeButton
         duration={4000}
       />
-      
+
       <main className="conteudo">
         {telaAtual === 'inicio' && (
           <Inicio
             aoCadastrar={() => setTelaAtual('cadastro')}
             busca={busca}
             setBusca={setBusca}
-
+            medicamentos={listaMedicamentos}
             abrirDashboard={(paciente) => {
               setPacienteSelecionado(paciente)
               setTelaAtual("dashboard")
@@ -64,9 +74,13 @@ function App() {
           setPacienteSelecionado={setPacienteSelecionado}
           voltarParaInicio={voltarParaInicio}
           aoClicarCadastrarRemedio={irParaCadastroRemedio}
+          medicamentos={listaMedicamentos}
         />)}
         {telaAtual === 'cadastro-remedio' && (
-          <CadastroRemedio voltarParaDashboard={voltarParaDashboard} />
+          <CadastroRemedio
+            voltarParaDashboard={voltarParaDashboard}
+            cadastrarMedicamento={cadastrarMedicamento}
+            pacienteSelecionado={pacienteSelecionado} />
         )}
       </main>
     </div>

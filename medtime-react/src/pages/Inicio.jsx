@@ -4,10 +4,9 @@ import Buscar from '../components/Buscar.jsx'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
 import { pacientes } from '../data/paciente.js'
-import { medicamentos } from '../data/medicamentos.js'
 import './Inicio.css'
 
-function Inicio({ aoCadastrar, busca, setBusca, abrirDashboard }) {
+function Inicio({ aoCadastrar, busca, setBusca, abrirDashboard, medicamentos }) {
     const pacientesFiltrados = pacientes.filter((paciente) =>
     paciente.nome.toLowerCase().includes(busca.trim().toLowerCase())
   )

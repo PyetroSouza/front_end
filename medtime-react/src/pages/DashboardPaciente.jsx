@@ -1,10 +1,9 @@
 import './DashboardPaciente.css'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
-import { medicamentos } from '../data/medicamentos.js'
 
 
-function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio }) {
+function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos }) {
     const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
     const medicamentosDoPaciente = medicamentos.filter(
         (medicamento) => medicamento.id_paciente === pacienteSelecionado?.id

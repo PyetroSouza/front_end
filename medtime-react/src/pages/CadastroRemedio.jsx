@@ -3,13 +3,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { medicamentoSchema } from "../schemas/medicamentoSchema"
 import { enviarImagem } from '../services/cloudinary'
+import { montarMedicamento } from "../utils/montarMedicamento"
 import { toast } from 'sonner'
 import AnexarImagem from "../components/AnexarImagem"
 
 
 import "./CadastroRemedio.css"
 
-function CadastroRemedio({ voltarParaDashboard }) {
+function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSelecionado }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
   const {
     register,
@@ -17,6 +18,7 @@ function CadastroRemedio({ voltarParaDashboard }) {
     formState: { errors, isSubmitting }
   } = useForm({
     resolver: zodResolver(medicamentoSchema),
+    mode: 'onTouched',
 
     defaultValues: {
       nome: '',
@@ -33,8 +35,14 @@ function CadastroRemedio({ voltarParaDashboard }) {
 
   async function adicionarMedicamento(dados) {
     console.log('Dados validados:', dados)
+    console.log('Paciente selecionado:', pacienteSelecionado)
     if (!imagemMedicamento) {
       toast.warning('Selecione uma imagem primeiro.')
+      return
+    }
+
+    if (!pacienteSelecionado) {
+      toast.error('Nenhum paciente selecionado.')
       return
     }
 
@@ -42,7 +50,16 @@ function CadastroRemedio({ voltarParaDashboard }) {
       const urlImagem = await enviarImagem(imagemMedicamento)
 
       console.log('URL da imagem:', urlImagem)
-      toast.success('Imagem enviada com sucesso!')
+      const novoMedicamento = montarMedicamento(
+        dados,
+        pacienteSelecionado.id,
+        urlImagem
+      )
+
+      cadastrarMedicamento(novoMedicamento)
+
+      toast.success('Medicamento cadastrado com sucesso!')
+      voltarParaDashboard()
     } catch (erro) {
       console.error(erro)
       toast.error('Erro ao enviar a imagem.', {

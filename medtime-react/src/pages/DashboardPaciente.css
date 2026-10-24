@@ -277,9 +277,10 @@
 
 .proximos-medicamentos-placeholder {
     width: 880px;
-    height: 412px;
+    min-height: 412px;
+    height: auto;
     background: #F9F9F9;
-    border: 2px solid #98989842
+    border: 2px solid #98989842;
 }
 
 .header-proximos-medicamentos {
@@ -330,6 +331,7 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    padding-bottom: 25px;
 }
 
 .remedio {
@@ -346,6 +348,12 @@
     opacity: 1;
     background: #F9F9F9;
     border: 2px solid #4EA8D842;
+    box-sizing: border-box;
+    max-width: calc(100% - 50px);
+    min-height: 78px;
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .info-esquerda {
@@ -354,12 +362,15 @@
     align-items: center;
     gap: 17px;
     padding-left: 25px;
+    min-width: 0;
+    flex: 1;
 }
 
 .nome-quantidade {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 0;
 }
 
 .nome-quantidade span {
@@ -370,6 +381,7 @@
     text-align: center;
     vertical-align: middle;
     color: #4EA8D8;
+    overflow-wrap: anywhere;
 }
 
 .nome-quantidade p {
@@ -388,6 +400,7 @@
     display: flex;
     flex-direction: column;
     padding-right: 26px;
+    flex-shrink: 0;
 }
 
 .tempo-remedio h1 {
