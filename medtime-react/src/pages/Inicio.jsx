@@ -4,33 +4,48 @@ import Buscar from '../components/Buscar.jsx'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
 import { pacientes } from '../data/paciente.js'
+import { medicamentos } from '../data/medicamentos.js'
 import './Inicio.css'
 
 function Inicio({ aoCadastrar, busca, setBusca, abrirDashboard }) {
-  const pacientesFiltrados = pacientes.filter((paciente) =>
+    const pacientesFiltrados = pacientes.filter((paciente) =>
     paciente.nome.toLowerCase().includes(busca.trim().toLowerCase())
-)
-  return (
-    <>
-      <BoasVindas aoCadastrar={aoCadastrar} />
+  )
 
-      <Buscar busca={busca} setBusca={setBusca} />
+  function buscarProximoMedicamento(idPaciente) {
+    const medicamentosDoPaciente = medicamentos.filter(
+      (medicamento) => medicamento.id_paciente === idPaciente
+    )
 
-      <div className="container">
-        <section className="resumo">
-          <div className="card_resumo card_ativos">
-            <p className="resumo_numero">{pacientes.length}</p>
-            <p className="resumo_texto">Pacientes Ativos</p>
-          </div>
+    const medicamentosOrdenados = [...medicamentosDoPaciente].sort(
+      (a, b) => a.proximo_horario.localeCompare(b.proximo_horario)
+    )
 
-          <div className="card_resumo card_alertas">
-            <p className="resumo_numero">0</p>
-            <p className="resumo_texto">Alertas Pendentes</p>
-          </div>
-        </section>
-        <div className="lista_pacientes">
+    return medicamentosOrdenados[0] || null
+  }
+
+return (
+  <>
+    <BoasVindas aoCadastrar={aoCadastrar} />
+
+    <Buscar busca={busca} setBusca={setBusca} />
+
+    <div className="container">
+      <section className="resumo">
+        <div className="card_resumo card_ativos">
+          <p className="resumo_numero">{pacientes.length}</p>
+          <p className="resumo_texto">Pacientes Ativos</p>
+        </div>
+
+        <div className="card_resumo card_alertas">
+          <p className="resumo_numero">0</p>
+          <p className="resumo_texto">Alertas Pendentes</p>
+        </div>
+      </section>
+      <div className="lista_pacientes">
         {pacientesFiltrados.map((paciente) => {
           const corAvatar = gerarCorAvatar(paciente.nome)
+            const proximoMedicamento = buscarProximoMedicamento(paciente.id)
 
           return (
             <article
@@ -61,15 +76,19 @@ function Inicio({ aoCadastrar, busca, setBusca, abrirDashboard }) {
 
               <p className="proximo_remedio">
                 <img src="/assets/relogio.svg" alt="" />
-                Próx. Med.: {paciente.proximoRemedio}
+                Próx. Med.: {proximoMedicamento
+                  ? `${proximoMedicamento.nome} ${proximoMedicamento.concentracao}${proximoMedicamento.sigla} - ${proximoMedicamento.proximo_horario}`
+                  : 'Nenhum medicamento cadastrado'
+                }
               </p>
             </article>
           )
         })}
-        </div>
       </div>
-    </>
-  )
+    </div>
+  </>
+)
 }
+
 
 export default Inicio

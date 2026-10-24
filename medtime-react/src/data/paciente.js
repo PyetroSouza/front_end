@@ -4,26 +4,25 @@ export const pacientes = [
         nome: 'Ana Maria De Jesus',
         idade: 78,
         condicoes: ['Alzheimer', 'Hipertensão'],
-        proximoRemedio: 'Omeprazol 100mg - 16:40'
+
     },
     {
         id: 2,
         nome: 'João F. Da Silva',
         idade: 60,
         condicoes: ['Alzheimer', 'Hipertensão'],
-        proximoRemedio: 'Omeprazol 100mg - 16:40'
+
     },
     {
         id: 3,
         nome: 'Felipe Alves Azevedo',
         idade: 75,
         condicoes: ['Alzheimer', 'Hipertensão'],
-        proximoRemedio: 'Omeprazol 100mg - 16:40'
+
     },{
         id: 4,
         nome: "Kayque Silva Almeida Siqueira",
         idade: 67,
         condicoes: ['AIDS', 'Demência'],
-        proximoRemedio: 'Dipirona 500mg - 17:00'
     }
 ]
