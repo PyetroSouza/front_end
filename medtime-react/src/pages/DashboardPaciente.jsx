@@ -98,14 +98,32 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                             </div>
                             <div className="menu-medicamentos">
                                 <img src="/assets/menu.svg" alt="menu" />
-                                <p>Ver todos medicamentos</p>
+                                <p>Ver todos medicamentos (em breve)</p>
                             </div>
                         </div>
                         <div className="container-remedios">
                             {medicamentosDoPaciente.length === 0 ? (
-                                <p className="sem-medicamentos">
-                                    Nenhum medicamento cadastrado para este paciente.
-                                </p>
+                                <div className="sem-medicamentos">
+                                    <img
+                                        src="/assets/remedio.svg"
+                                        alt=""
+                                        aria-hidden="true"
+                                    />
+
+                                    <p>Nenhum medicamento cadastrado</p>
+
+                                    <span>
+                                        Adicione um medicamento para começar
+                                        a acompanhar os horários deste paciente.
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        onClick={aoClicarCadastrarRemedio}
+                                    >
+                                        Adicionar medicamento
+                                    </button>
+                                </div>
                             ) : (
                                 medicamentosDoPaciente.map((medicamento) => (
                                     <div

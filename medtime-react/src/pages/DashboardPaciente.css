@@ -107,9 +107,19 @@
     justify-content: center;
     align-items: center;
     gap: 3.95px;
+
     margin-right: 38.92px;
     margin-bottom: 41.1px;
-    background: linear-gradient(90deg, #1ABC9C 5%, #2CB977 95%);
+
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    color: #FFFFFF;
+    cursor: pointer;
+
+    background: linear-gradient(90deg,
+            #1ABC9C 5%,
+            #2CB977 95%);
 }
 
 .dashboard-inferior-grid {
@@ -233,6 +243,12 @@
     color: #F9F9F9;
 }
 
+.localizacao,
+.historico {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 .dados-pulseira {
     display: flex;
     flex-direction: row;
@@ -305,6 +321,11 @@
 
 .menu-medicamentos {
     padding-right: 27px;
+}
+
+.menu-medicamentos {
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 .proximos-medicamentos span {
@@ -422,6 +443,50 @@
     vertical-align: middle;
     margin: 0;
     color: #4EA8D8;
+}
+
+.sem-medicamentos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 20px;
+    text-align: center;
+}
+
+.sem-medicamentos img {
+    width: 40px;
+    height: 40px;
+}
+
+.sem-medicamentos p {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1E2F4B;
+}
+
+.sem-medicamentos span {
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #6B7280;
+}
+
+.sem-medicamentos button {
+    margin-top: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #009951;
+    color: #FFFFFF;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.sem-medicamentos button:focus-visible {
+    outline: 3px solid #1C86BF;
+    outline-offset: 3px;
 }
 
 @media (max-width: 1024px) {

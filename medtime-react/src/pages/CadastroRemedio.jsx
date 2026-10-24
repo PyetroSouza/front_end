@@ -103,10 +103,16 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                 id="nome-medicamento"
                 maxLength={45}
                 placeholder="Ex: Dipirona"
+                aria-invalid={!!errors.nome}
+                aria-describedby={errors.nome ? 'erro-nome' : undefined}
+                className={errors.nome ? 'campo-invalido' : ''}
                 {...register('nome')}
               />
               {errors.nome && (
-                <p className="mensagem-erro">
+
+                <p
+                  id="erro-nome"
+                  className="mensagem-erro">
                   {errors.nome.message}
                 </p>
               )}
@@ -121,10 +127,14 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                   min="0"
                   step="any"
                   placeholder="Ex: 10"
+                  aria-invalid={!!errors.dose}
+                  aria-describedby={errors.dose ? 'erro-dose' : undefined}
+                  className={errors.dose ? 'campo-invalido' : ''}
                   {...register('dose')}
                 />
                 {errors.dose && (
-                  <p className="mensagem-erro">
+                  <p id="erro-dose"
+                    className="mensagem-erro">
                     {errors.dose.message}
                   </p>
                 )}
@@ -135,6 +145,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                 <label htmlFor="tipo-dosagem">Tipo da dosagem</label>
                 <select
                   id="tipo-dosagem"
+                  aria-invalid={!!errors.tipoDosagem}
+                  aria-describedby={errors.tipoDosagem ? 'erro-tipoDosagem' : undefined}
+                  className={errors.tipoDosagem ? 'campo-invalido' : ''}
                   {...register('tipoDosagem')}
                 >
                   <option value="" disabled>Selecione</option>
@@ -146,7 +159,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                   <option value="outro">Outro</option>
                 </select>
                 {errors.tipoDosagem && (
-                  <p className="mensagem-erro">
+                  <p
+                    id="erro-tipoDosagem"
+                    className="mensagem-erro">
                     {errors.tipoDosagem.message}
                   </p>
                 )}
@@ -156,13 +171,19 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
             <div className="linha-campos">
               <div className="campo-formulario">
                 <label htmlFor="concentracao">Concentração</label>
-                <input type="text"
+                <input
+                  type="text"
                   id="concentracao"
+                  aria-invalid={!!errors.concentracao}
+                  aria-describedby={errors.concentracao ? 'concentracao' : undefined}
+                  className={errors.concentracao ? 'campo-invalido' : ''}
                   {...register('concentracao')}
                   placeholder="Ex: 50 mg/mL"
                 />
                 {errors.concentracao && (
-                  <p className="mensagem-erro">
+                  <p
+                    id="erro-concentracao"
+                    className="mensagem-erro">
                     {errors.concentracao.message}
                   </p>
                 )}
@@ -172,6 +193,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                 <label htmlFor="tipo-medicamento">Tipo de medicamento</label>
                 <select
                   id="tipo-medicamento"
+                  aria-invalid={!!errors.tipoMedicamento}
+                  aria-describedby={errors.tipoMedicamento ? 'erro-tipoMedicamento' : undefined}
+                  className={errors.tipoMedicamento ? 'campo-invalido' : ''}
                   {...register('tipoMedicamento')}
                 >
                   <option value="comprimido">Comprimido (CP)</option>
@@ -181,7 +205,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                   <option value="outro">Outro</option>
                 </select>
                 {errors.tipoMedicamento && (
-                  <p className="mensagem-erro">
+                  <p
+                    id="erro-tipoMedicamento"
+                    className="mensagem-erro">
                     {errors.tipoMedicamento.message}
                   </p>
                 )}
@@ -193,6 +219,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                 <label htmlFor="intervalo">Intervalo de dosagem</label>
                 <select
                   id="intervalo"
+                  aria-invalid={!!errors.intervalo}
+                  aria-describedby={errors.intervalo ? 'erro-intervalo' : undefined}
+                  className={errors.intervalo ? 'campo-invalido' : ''}
                   {...register('intervalo')}
                 >
                   <option value="hora">Hora</option>
@@ -200,7 +229,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                   <option value="semana">Semana</option>
                 </select>
                 {errors.intervalo && (
-                  <p className="mensagem-erro">
+                  <p
+                    id="erro-intervalo"
+                    className="mensagem-erro">
                     {errors.intervalo.message}
                   </p>
                 )}
@@ -211,10 +242,15 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
                 <input
                   type="time"
                   id="horario"
+                  aria-invalid={!!errors.horario}
+                  aria-describedby={errors.horario ? 'erro-horario' : undefined}
+                  className={errors.horario ? 'campo-invalido' : ''}
                   {...register('horario')}
                 />
                 {errors.horario && (
-                  <p className="mensagem-erro">
+                  <p
+                    id="erro-horario"
+                    className="mensagem-erro">
                     {errors.horario.message}
                   </p>
                 )}
@@ -232,11 +268,16 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
             <input
               type="text"
               id="quantidade"
+              aria-invalid={!!errors.quantidade}
+              aria-describedby={errors.quantidade ? 'erro-quantidade' : undefined}
+              className={errors.quantidade ? 'campo-invalido' : ''}
               {...register('quantidade')}
               placeholder="Ex: 350 mL"
             />
             {errors.quantidade && (
-              <p className="mensagem-erro">
+              <p 
+              id="erro-quantidade"
+              className="mensagem-erro">
                 {errors.quantidade.message}
               </p>
             )}

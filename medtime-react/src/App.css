@@ -26,18 +26,8 @@
   background-color: #1e4f91;
 }
 
-/* Conteúdo das telas */
 .conteudo {
   width: 100%;
-}
-
-.conteudo button {
-  background-color: #2864b4;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .lista-pacientes {
