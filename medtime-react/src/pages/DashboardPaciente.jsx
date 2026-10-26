@@ -1,13 +1,33 @@
 import './DashboardPaciente.css'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
+import { Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 
-function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos }) {
+function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento}) {
     const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
     const medicamentosDoPaciente = medicamentos.filter(
         (medicamento) => medicamento.id_paciente === pacienteSelecionado?.id
     )
+
+    function confirmarExclusao(medicamento) {
+        toast.warning(`Excluir ${medicamento.nome}?`, {
+            description: 'Essa ação removerá o medicamento da lista.',
+            duration: 10000,
+            action: {
+                label: 'Excluir',
+                onClick: () => {
+                    excluirMedicamento(medicamento.id_medicamento)
+                    toast.success('Medicamento excluído com sucesso!')
+                }
+            },
+            cancel: {
+                label: 'Cancelar',
+                onClick: () => toast.dismiss()
+            }
+        })
+    }
 
     return (
         <div className="dashboard-conteudo">
@@ -36,8 +56,9 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                             <p className="idade">{pacienteSelecionado?.idade || 78} anos</p>
 
                             <ul className="tags">
-                                <li>Alzheimer</li>
-                                <li>Hipertensão</li>
+                                {pacienteSelecionado?.condicoes?.map((condicao) => (
+                                    <li key={condicao}>{condicao}</li>
+                                ))}
                             </ul>
                         </div>
                     </div>
@@ -151,6 +172,27 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                                         <div className="tempo-remedio">
                                             <h1>{medicamento.proximo_horario}</h1>
                                             <p>Horário previsto</p>
+                                        </div>
+                                        <div className="acoes-medicamento">
+                                            <button
+                                                type="button"
+                                                className="botao-editar"
+                                                aria-label={`Editar ${medicamento.nome}`}
+                                                title="Editar medicamento"
+                                                onClick={() => aoEditarMedicamento(medicamento)}
+                                            >
+                                                <Pencil size={18} strokeWidth={2}> </Pencil>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                className="botao-excluir"
+                                                aria-label={`Excluir ${medicamento.nome}`}
+                                                title="Excluir medicamento"
+                                                 onClick={() => confirmarExclusao(medicamento)}
+                                            >
+                                                <Trash2 size={18} strokeWidth={2}> </Trash2>
+                                            </button>
                                         </div>
                                     </div>
                                 ))

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-function AnexarImagem({aoSelecionarImagem}) {
+function AnexarImagem({ aoSelecionarImagem, imagemInicial}) {
     const [imagem, setImagem] = useState(null)
     const [preview, setPreview] = useState(null)
     const [enviando, setEnviando] = useState(false)
@@ -58,9 +58,9 @@ function AnexarImagem({aoSelecionarImagem}) {
             />
 
             <label htmlFor="imagem-medicamento" className="area-upload">
-                {preview ? (
+                {(preview || imagemInicial) ? (
                     <img
-                        src={preview}
+                        src={preview || imagemInicial}
                         alt="Pré-visualização do medicamento"
                         className="preview-medicamento"
                     />

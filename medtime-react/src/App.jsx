@@ -18,6 +18,7 @@ function App() {
   const [listaMedicamentos, setListaMedicamentos] = useState(
     () => [...medicamentosIniciais]
   )
+  const [medicamentoEmEdicao, setMedicamentoEmEdicao] = useState(null)
 
   function voltarParaInicio() {
     setTelaAtual('inicio')
@@ -29,7 +30,8 @@ function App() {
   }
 
   function irParaCadastroRemedio() {
-    setTelaAtual("cadastro-remedio")
+    setMedicamentoEmEdicao(null)
+    setTelaAtual('cadastro-remedio')
   }
 
   function cadastrarMedicamento(novoMedicamento) {
@@ -37,6 +39,37 @@ function App() {
       ...listaAnterior,
       novoMedicamento
     ])
+  }
+
+  function excluirMedicamento(idMedicamento) {
+    console.log('ID recebido para excluir:', idMedicamento)
+
+    setListaMedicamentos((listaAnterior) => {
+      console.log('Lista antes:', listaAnterior)
+
+      const novaLista = listaAnterior.filter(
+        (medicamento) => medicamento.id_medicamento !== idMedicamento
+      )
+
+      console.log('Lista depois:', novaLista)
+
+      return novaLista
+    })
+  }
+
+  function iniciarEdicaoMedicamento(medicamento) {
+    setMedicamentoEmEdicao(medicamento)
+    setTelaAtual('cadastro-remedio')
+  }
+
+  function atualizarMedicamento(medicamentoAtualizado) {
+    setListaMedicamentos((listaAnterior) =>
+      listaAnterior.map((medicamento) =>
+        medicamento.id_medicamento === medicamentoAtualizado.id_medicamento
+          ? medicamentoAtualizado
+          : medicamento
+      )
+    )
   }
 
   return (
@@ -73,13 +106,17 @@ function App() {
           pacienteSelecionado={pacienteSelecionado}
           setPacienteSelecionado={setPacienteSelecionado}
           voltarParaInicio={voltarParaInicio}
+          excluirMedicamento={excluirMedicamento}
           aoClicarCadastrarRemedio={irParaCadastroRemedio}
+          aoEditarMedicamento={iniciarEdicaoMedicamento}
           medicamentos={listaMedicamentos}
         />)}
         {telaAtual === 'cadastro-remedio' && (
           <CadastroRemedio
             voltarParaDashboard={voltarParaDashboard}
             cadastrarMedicamento={cadastrarMedicamento}
+            medicamentoEmEdicao={medicamentoEmEdicao}
+            atualizarMedicamento={atualizarMedicamento}
             pacienteSelecionado={pacienteSelecionado} />
         )}
       </main>

@@ -23,6 +23,12 @@ export const pacientes = [
         id: 4,
         nome: "Kayque Silva Almeida Siqueira",
         idade: 67,
-        condicoes: ['AIDS', 'Demência'],
+        condicoes: ['Câncer', 'Demência'],
+    },
+    {
+        id: 5,
+        nome: "Kauan Silva Alves Nascimento",
+        idade: 28,
+        condicoes: ['Dor de cabeça', 'Amor']
     }
 ]

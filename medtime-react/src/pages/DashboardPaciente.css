@@ -420,7 +420,7 @@
 .tempo-remedio {
     display: flex;
     flex-direction: column;
-    padding-right: 26px;
+    padding-right: 8px;
     flex-shrink: 0;
 }
 
@@ -443,6 +443,54 @@
     vertical-align: middle;
     margin: 0;
     color: #4EA8D8;
+}
+
+.acoes-medicamento {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 12px;
+    flex-shrink: 0;
+}
+
+.acoes-medicamento button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+    padding: 0;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+
+    font-size: 18px;
+    transition: background-color 0.2s ease;
+}
+
+.acoes-medicamento .botao-editar {
+    background-color: #EAF5FB;
+    color: #1D6FA4;
+}
+
+.acoes-medicamento .botao-editar:hover {
+    background-color: #D3EAF7;
+}
+
+.acoes-medicamento .botao-excluir {
+    background-color: #FFF1F0;
+    color: #C0392B;
+}
+
+.acoes-medicamento .botao-excluir:hover {
+    background-color: #FFE0DC;
+}
+
+.acoes-medicamento button:focus-visible {
+    outline: 3px solid #1D6FA4;
+    outline-offset: 2px;
 }
 
 .sem-medicamentos {

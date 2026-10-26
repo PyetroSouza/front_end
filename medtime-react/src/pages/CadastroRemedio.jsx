@@ -2,16 +2,16 @@ import { useState } from "react"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { medicamentoSchema } from "../schemas/medicamentoSchema"
-import { enviarImagem } from '../services/cloudinary'
-import { montarMedicamento } from "../utils/montarMedicamento"
+import { prepararMedicamento } from '../services/medicamentoService'
 import { toast } from 'sonner'
 import AnexarImagem from "../components/AnexarImagem"
 
 
 import "./CadastroRemedio.css"
 
-function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSelecionado }) {
+function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
+  const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
     register,
     handleSubmit,
@@ -21,49 +21,63 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
     mode: 'onTouched',
 
     defaultValues: {
-      nome: '',
-      dose: '',
-      tipoDosagem: '',
-      concentracao: '',
-      tipoMedicamento: 'comprimido',
-      intervalo: 'dia',
-      horario: '08:00',
-      quantidade: '',
-      descricao: ''
+      nome: medicamentoEmEdicao?.nome ?? '',
+
+      dose: medicamentoEmEdicao?.quantidade_dose != null
+        ? String(medicamentoEmEdicao.quantidade_dose)
+        : '',
+
+      tipoDosagem: medicamentoEmEdicao?.tipo_dosagem
+        ?.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') ?? '',
+
+      concentracao: medicamentoEmEdicao
+        ? `${medicamentoEmEdicao.concentracao} ${medicamentoEmEdicao.sigla}`
+        : '',
+
+      tipoMedicamento: medicamentoEmEdicao?.tipoMedicamento ?? 'comprimido',
+      intervalo: medicamentoEmEdicao?.intervalo ?? 'dia',
+      horario: medicamentoEmEdicao?.proximo_horario ?? '08:00',
+      quantidade: medicamentoEmEdicao?.quantidade ?? '',
+      descricao: medicamentoEmEdicao?.descricao ?? ''
     }
+
   })
 
   async function adicionarMedicamento(dados) {
-    console.log('Dados validados:', dados)
-    console.log('Paciente selecionado:', pacienteSelecionado)
-    if (!imagemMedicamento) {
-      toast.warning('Selecione uma imagem primeiro.')
-      return
-    }
-
     if (!pacienteSelecionado) {
       toast.error('Nenhum paciente selecionado.')
       return
     }
 
+    if (!modoEdicao && !imagemMedicamento) {
+      toast.warning('Selecione uma imagem primeiro.')
+      return
+    }
+
     try {
-      const urlImagem = await enviarImagem(imagemMedicamento)
-
-      console.log('URL da imagem:', urlImagem)
-      const novoMedicamento = montarMedicamento(
+      const medicamentoPreparado = await prepararMedicamento({
         dados,
-        pacienteSelecionado.id,
-        urlImagem
-      )
+        pacienteId: pacienteSelecionado.id,
+        imagemMedicamento,
+        medicamentoEmEdicao
+      })
 
-      cadastrarMedicamento(novoMedicamento)
+      if (modoEdicao) {
+        atualizarMedicamento(medicamentoPreparado)
+        toast.success('Medicamento atualizado com sucesso!')
+      } else {
+        cadastrarMedicamento(medicamentoPreparado)
+        toast.success('Medicamento cadastrado com sucesso!')
+      }
 
-      toast.success('Medicamento cadastrado com sucesso!')
       voltarParaDashboard()
+
     } catch (erro) {
       console.error(erro)
-      toast.error('Erro ao enviar a imagem.', {
-        description: 'Não foi possível concluir o upload. Tente novamente.'
+
+      toast.error('Não foi possível salvar o medicamento.', {
+        description: erro.message
       })
     }
   }
@@ -85,13 +99,16 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
 
       <div className="formulario-cadastro-remedio">
         <div className="header-formulario">
-          <h1>Cadastro de Medicamento</h1>
+          <h1>{modoEdicao ? 'Editar Medicamento' : 'Cadastro de Medicamento'}</h1>
           <p>Preencha as informações do medicamento para adicioná-lo ao tratamento</p>
         </div>
 
         <div className="cadastrar">
 
-          <AnexarImagem aoSelecionarImagem={setImagemMedicamento} />
+          <AnexarImagem
+            aoSelecionarImagem={setImagemMedicamento}
+            imagemInicial={medicamentoEmEdicao?.imagem}
+          />
 
 
           <div className="formulario-esquerdo">
@@ -275,9 +292,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
               placeholder="Ex: 350 mL"
             />
             {errors.quantidade && (
-              <p 
-              id="erro-quantidade"
-              className="mensagem-erro">
+              <p
+                id="erro-quantidade"
+                className="mensagem-erro">
                 {errors.quantidade.message}
               </p>
             )}
@@ -299,7 +316,12 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
               className="botao-adicionar-medicamento"
               onClick={handleSubmit(adicionarMedicamento, formularioInvalido)}
               disabled={isSubmitting}>
-              {isSubmitting ? 'Enviando...' : 'Adicionar medicamento'}
+              {isSubmitting
+                ? 'Salvando...'
+                : modoEdicao
+                  ? 'Salvar alterações'
+                  : 'Adicionar medicamento'
+              }
             </button>
           </div>
 
