@@ -685,4 +685,42 @@
     .tempo-remedio p {
         font-size: 11px;
     }
+
+    .remedio {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px 8px;
+        padding: 16px;
+    }
+
+    .info-esquerda {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+
+    .nome-quantidade {
+        align-items: flex-start;
+    }
+
+    .nome-quantidade span {
+        text-align: left;
+        line-height: 1.4;
+        overflow-wrap: break-word;
+    }
+
+    .nome-quantidade p {
+        text-align: left;
+    }
+
+    .tempo-remedio {
+        grid-column: 1;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .acoes-medicamento {
+        grid-column: 2;
+        padding-right: 0;
+        justify-content: flex-end;
+    }
 }

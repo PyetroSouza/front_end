@@ -82,7 +82,7 @@
 .avatar,
 .info {
     align-self: center;
-} 
+}
 
 .info {
     display: flex;
@@ -161,5 +161,6 @@
 
     .card_paciente {
         width: 100%;
+        row-gap: 12px;
     }
 }

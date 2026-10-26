@@ -238,9 +238,14 @@
 @media (max-width: 800px) {
     .formulario-cadastro-remedio {
         width: 95%;
-        padding: 24px;
+        max-width: none;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
     }
-
+    .header-formulario{
+        text-align: center;
+    }
     .cadastrar {
         flex-direction: column;
     }
@@ -256,5 +261,4 @@
 
     .botao-adicionar-medicamento {
         width: 100%;
-    }
-}
+    }}
