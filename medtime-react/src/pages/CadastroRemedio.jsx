@@ -100,7 +100,11 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
       <div className="formulario-cadastro-remedio">
         <div className="header-formulario">
           <h1>{modoEdicao ? 'Editar Medicamento' : 'Cadastro de Medicamento'}</h1>
-          <p>Preencha as informações do medicamento para adicioná-lo ao tratamento</p>
+          <p>
+            {modoEdicao
+              ? 'Atualize as informações do medicamento conforme necessário.'
+              : 'Preencha as informações do medicamento para adicioná-lo ao tratamento.'}
+          </p>
         </div>
 
         <div className="cadastrar">
