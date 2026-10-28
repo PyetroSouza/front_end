@@ -39,23 +39,20 @@ export const medicamentoSchema = z.object({
             'Informe um horário válido no formato HH:mm'
         ),
 
-    concentracao: z.string()
-        .trim()
+    concentracao: z.number()
         .min(1, 'Informe a concentração')
-        .max(50, 'A concentração deve ter no máximo 50 caracteres')
-        .regex(
-            /\d/,
-            'A concentração deve conter um valor numérico'
-        )
+        .max(50, 'A concentração deve ter no máximo 50 caracteres'),
+
+    unidadeConcentracao: z.string()
+        .trim()
+        .min(1)
+        .max(24)
         .regex(
             /[a-zA-Zµμ]/,
             'Informe a unidade da concentração'
         ),
-
-    tipoMedicamento: z.enum(
-        ['comprimido', 'capsula', 'liquido', 'gotas', 'outro'],
-        { error: 'Selecione um tipo de medicamento válido' }
-    ),
+    frequencia: z.number()
+        .min(1),
 
     intervalo: z.enum(
         ['hora', 'dia', 'semana'],

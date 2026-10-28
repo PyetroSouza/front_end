@@ -14,11 +14,15 @@ export function montarMedicamento(dados, pacienteId, urlImagem) {
     id_medicamento: crypto.randomUUID(),
     id_paciente: pacienteId,
     nome: dados.nome,
-    concentracao: valorConcentracao,
-    sigla: unidadeConcentracao,
+    concentracao: Number(dados.concentracao),
+    id_unidade_medida_embalagem: Number(dados.unidadeConcentracao),
     tipo_dosagem: dados.tipoDosagem,
     quantidade_dose: Number(dados.dose),
+    frequencia: Number(dados.frequencia),
+    intervalo: dados.intervalo,
     proximo_horario: dados.horario,
+    quantidade: dados.quantidade,
+    descricao: dados.descricao,
     imagem: urlImagem
   }
 }

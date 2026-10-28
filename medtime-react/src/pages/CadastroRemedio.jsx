@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { buscarUnidadesMedida } from '../services/api.js'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { medicamentoSchema } from "../schemas/medicamentoSchema"
@@ -12,10 +13,12 @@ import "./CadastroRemedio.css"
 
 function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarMedicamentoLocal, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
+  const [unidades, setUnidades] = useState([])
   const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting }
   } = useForm({
     resolver: zodResolver(medicamentoSchema),
@@ -33,8 +36,14 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
         .replace(/[\u0300-\u036f]/g, '') ?? '',
 
       concentracao: medicamentoEmEdicao
-        ? `${medicamentoEmEdicao.concentracao} ${medicamentoEmEdicao.sigla}`
+        ? String(medicamentoEmEdicao.concentracao)
         : '',
+
+      unidadeConcentracao: medicamentoEmEdicao
+        ? String(medicamentoEmEdicao.id_unidade_medida_embalagem ?? '')
+        : '',
+
+      frequencia: medicamentoEmEdicao?.frequencia ?? 5,
 
       tipoMedicamento: medicamentoEmEdicao?.tipoMedicamento ?? 'comprimido',
       intervalo: medicamentoEmEdicao?.intervalo ?? 'dia',
@@ -44,6 +53,25 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
     }
 
   })
+
+  useEffect(() => {
+    async function carregarUnidades() {
+      try {
+        const resultado = await buscarUnidadesMedida()
+  
+        console.log('Unidades recebidas:', resultado)
+  
+        setUnidades(resultado)
+      } catch (erro) {
+        console.error('Erro ao carregar unidades:', erro)
+      }
+    }
+  
+    carregarUnidades()
+  }, [])
+
+  const frequencia = watch('frequencia')
+  const intervalo = watch('intervalo')
 
   async function adicionarMedicamento(dados) {
     console.log('✅ Formulário válido!', dados)
@@ -74,19 +102,20 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
           nome: medicamentoPreparado.nome,
           imagem: medicamentoPreparado.imagem,
           concentracao: Number(medicamentoPreparado.concentracao),
-          id_unidade_medida_embalagem: 1,
+          id_unidade_medida_embalagem:
+            Number(medicamentoPreparado.id_unidade_medida_embalagem),
           id_tipo_dosagem: 1,
           id_usuario: 2
         }
-      
+
         console.log('📦 Enviando para API:', medicamentoAPI)
-      
+
         const resultado = await cadastrarMedicamentoAPI(medicamentoAPI)
-      
+
         console.log('✅ Resposta da API:', resultado)
-      
+
         cadastrarMedicamentoLocal(medicamentoPreparado)
-      
+
         toast.success('Medicamento cadastrado com sucesso!')
       }
 
@@ -229,30 +258,38 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                     {errors.concentracao.message}
                   </p>
                 )}
+                <div className="campo-formulario">
+                  <label>Unidade de medida</label>
+                  <select {...register('unidadeConcentracao')}>
+                    <option value="">Selecione</option>
+                    {unidades.map(unidade => (
+                      <option key={unidade.id} value={unidade.id}>
+                        {unidade.sigla}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="campo-formulario">
-                <label htmlFor="tipo-medicamento">Tipo de medicamento</label>
-                <select
-                  id="tipo-medicamento"
-                  aria-invalid={!!errors.tipoMedicamento}
-                  aria-describedby={errors.tipoMedicamento ? 'erro-tipoMedicamento' : undefined}
-                  className={errors.tipoMedicamento ? 'campo-invalido' : ''}
-                  {...register('tipoMedicamento')}
-                >
-                  <option value="comprimido">Comprimido (CP)</option>
-                  <option value="capsula">Cápsula</option>
-                  <option value="liquido">Líquido</option>
-                  <option value="gotas">Gotas</option>
-                  <option value="outro">Outro</option>
-                </select>
-                {errors.tipoMedicamento && (
-                  <p
-                    id="erro-tipoMedicamento"
-                    className="mensagem-erro">
-                    {errors.tipoMedicamento.message}
-                  </p>
-                )}
+                <label htmlFor="frequencia">Frequência</label>
+
+                <div className="input-container">
+                  <span className="prefix">De</span>
+
+                  <input
+                    type="number"
+                    id="frequencia"
+                    min="1"
+                    max={intervalo === 'hora' ? 24 : undefined}
+                    placeholder="5"
+                    {...register('frequencia', { valueAsNumber: true })}
+                  />
+
+                  <span className="suffix">
+                    em {frequencia || 5} {intervalo === 'hora' ? 'horas' : 'dias'}
+                  </span>
+                </div>
               </div>
             </div>
 

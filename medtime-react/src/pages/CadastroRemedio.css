@@ -192,6 +192,22 @@
     outline-offset: 1px;
 }
 
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .input-container input {
+    width: 75px;
+    text-align: center;
+  }
+  
+  .prefix,
+  .suffix {
+    white-space: nowrap;
+  }
+
 .acoes-formulario {
     display: flex;
     justify-content: flex-end;
