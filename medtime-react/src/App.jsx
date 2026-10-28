@@ -1,4 +1,6 @@
 
+import {buscarUnidadesMedida} from './services/api.js'
+import {useEffect} from 'react'
 import { useState } from 'react'
 import Inicio from './pages/Inicio.jsx'
 import CadastroIdoso from './pages/CadastroIdoso'
@@ -71,6 +73,19 @@ function App() {
       )
     )
   }
+
+  useEffect(() => {
+    async function testarAPI() {
+      try {
+        const unidades = await buscarUnidadesMedida()
+        console.log('Dados recebidos da API:', unidades)
+      } catch (erro) {
+        console.error('Erro na conexão:', erro.message)
+      }
+    }
+  
+    testarAPI()
+  }, [])
 
   return (
     <div className="aplicacao">

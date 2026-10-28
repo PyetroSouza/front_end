@@ -3,13 +3,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { medicamentoSchema } from "../schemas/medicamentoSchema"
 import { prepararMedicamento } from '../services/medicamentoService'
+import { cadastrarMedicamentoAPI } from '../services/api.js'
 import { toast } from 'sonner'
 import AnexarImagem from "../components/AnexarImagem"
 
 
 import "./CadastroRemedio.css"
 
-function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
+function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarMedicamentoLocal, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
   const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
@@ -45,6 +46,8 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
   })
 
   async function adicionarMedicamento(dados) {
+    console.log('✅ Formulário válido!', dados)
+
     if (!pacienteSelecionado) {
       toast.error('Nenhum paciente selecionado.')
       return
@@ -67,7 +70,23 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
         atualizarMedicamento(medicamentoPreparado)
         toast.success('Medicamento atualizado com sucesso!')
       } else {
-        cadastrarMedicamento(medicamentoPreparado)
+        const medicamentoAPI = {
+          nome: medicamentoPreparado.nome,
+          imagem: medicamentoPreparado.imagem,
+          concentracao: Number(medicamentoPreparado.concentracao),
+          id_unidade_medida_embalagem: 1,
+          id_tipo_dosagem: 1,
+          id_usuario: 2
+        }
+      
+        console.log('📦 Enviando para API:', medicamentoAPI)
+      
+        const resultado = await cadastrarMedicamentoAPI(medicamentoAPI)
+      
+        console.log('✅ Resposta da API:', resultado)
+      
+        cadastrarMedicamentoLocal(medicamentoPreparado)
+      
         toast.success('Medicamento cadastrado com sucesso!')
       }
 
@@ -83,6 +102,7 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
   }
 
   function formularioInvalido(erros) {
+    console.log('❌ Erros de validação:', erros)
     const primeiroErro = Object.values(erros)[0]
 
     if (primeiroErro) {
@@ -97,7 +117,8 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
         &lt; Voltar
       </button>
 
-      <div className="formulario-cadastro-remedio">
+      <form className="formulario-cadastro-remedio" onSubmit={handleSubmit(adicionarMedicamento, formularioInvalido)}>
+
         <div className="header-formulario">
           <h1>{modoEdicao ? 'Editar Medicamento' : 'Cadastro de Medicamento'}</h1>
           <p>
@@ -316,9 +337,8 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
 
           <div className="acoes-formulario">
             <button
-              type="button"
+              type="submit"
               className="botao-adicionar-medicamento"
-              onClick={handleSubmit(adicionarMedicamento, formularioInvalido)}
               disabled={isSubmitting}>
               {isSubmitting
                 ? 'Salvando...'
@@ -330,7 +350,7 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento, pacienteSe
           </div>
 
         </div>
-      </div>
+      </form>
     </div>
 
   )
