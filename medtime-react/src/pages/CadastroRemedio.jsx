@@ -1,19 +1,26 @@
-import { useState, useEffect } from "react"
-import { buscarUnidadesMedida } from '../services/api.js'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { medicamentoSchema } from "../schemas/medicamentoSchema"
+import { medicamentoSchema } from '../schemas/medicamentoSchema'
 import { prepararMedicamento } from '../services/medicamentoService'
-import { cadastrarMedicamentoAPI } from '../services/api.js'
+import { montarPayloadMedicamento } from '../utils/montarPayloadMedicamento'
+import { cadastrarMedicamentoCompleto } from '../services/api'
+import {
+  buscarUnidadesMedida,
+  buscarTiposDosagem,
+  buscarTiposIntervalo,
+  cadastrarMedicamentoAPI
+} from '../services/api.js'
 import { toast } from 'sonner'
-import AnexarImagem from "../components/AnexarImagem"
+import AnexarImagem from '../components/AnexarImagem'
 
-
-import "./CadastroRemedio.css"
+import './CadastroRemedio.css'
 
 function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarMedicamentoLocal, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
   const [unidades, setUnidades] = useState([])
+  const [tiposDosagem, setTiposDosagem] = useState([])
+  const [tiposIntervalo, setTiposIntervalo] = useState([])
   const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
     register,
@@ -31,9 +38,11 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
         ? String(medicamentoEmEdicao.quantidade_dose)
         : '',
 
-      tipoDosagem: medicamentoEmEdicao?.tipo_dosagem
-        ?.normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') ?? '',
+      tipoDosagem: medicamentoEmEdicao?.id_tipo_dosagem != null
+        ? String(medicamentoEmEdicao.id_tipo_dosagem)
+        : '',
+
+      unidadeDose: '',
 
       concentracao: medicamentoEmEdicao
         ? String(medicamentoEmEdicao.concentracao)
@@ -46,7 +55,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
       frequencia: medicamentoEmEdicao?.frequencia ?? 5,
 
       tipoMedicamento: medicamentoEmEdicao?.tipoMedicamento ?? 'comprimido',
-      intervalo: medicamentoEmEdicao?.intervalo ?? 'dia',
+      intervalo: medicamentoEmEdicao?.id_tipo_intervalo != null
+        ? String(medicamentoEmEdicao.id_tipo_intervalo)
+        : '',
       horario: medicamentoEmEdicao?.proximo_horario ?? '08:00',
       quantidade: medicamentoEmEdicao?.quantidade ?? '',
       descricao: medicamentoEmEdicao?.descricao ?? ''
@@ -55,19 +66,24 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
   })
 
   useEffect(() => {
-    async function carregarUnidades() {
+    async function carregarOpcoes() {
       try {
-        const resultado = await buscarUnidadesMedida()
-  
-        console.log('Unidades recebidas:', resultado)
-  
-        setUnidades(resultado)
+        const [unidadesAPI, dosagensAPI, intervalosAPI] = await Promise.all([
+          buscarUnidadesMedida(),
+          buscarTiposDosagem(),
+          buscarTiposIntervalo()
+        ])
+
+        setUnidades(unidadesAPI)
+        setTiposDosagem(dosagensAPI)
+        setTiposIntervalo(intervalosAPI)
       } catch (erro) {
-        console.error('Erro ao carregar unidades:', erro)
+        console.error('Erro ao carregar opções:', erro)
+        toast.error('Não foi possível carregar as opções do formulário')
       }
     }
-  
-    carregarUnidades()
+
+    carregarOpcoes()
   }, [])
 
   const frequencia = watch('frequencia')
@@ -98,19 +114,16 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
         atualizarMedicamento(medicamentoPreparado)
         toast.success('Medicamento atualizado com sucesso!')
       } else {
-        const medicamentoAPI = {
-          nome: medicamentoPreparado.nome,
-          imagem: medicamentoPreparado.imagem,
-          concentracao: Number(medicamentoPreparado.concentracao),
-          id_unidade_medida_embalagem:
-            Number(medicamentoPreparado.id_unidade_medida_embalagem),
-          id_tipo_dosagem: 1,
-          id_usuario: 2
-        }
+        const idUsuarioTeste = 2
 
-        console.log('📦 Enviando para API:', medicamentoAPI)
+        const payload = montarPayloadMedicamento(
+          medicamentoPreparado,
+          idUsuarioTeste
+        )
 
-        const resultado = await cadastrarMedicamentoAPI(medicamentoAPI)
+        console.log('📦 Payload enviado:', payload)
+
+        const resultado = await cadastrarMedicamentoCompleto(payload)
 
         console.log('✅ Resposta da API:', resultado)
 
@@ -211,23 +224,39 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                 )}
 
               </div>
+              <div className="campo-formulario">
+                <label htmlFor="unidade-dose">Unidade da dose</label>
+
+                <select
+                  id="unidade-dose"
+                  {...register('unidadeDose')}
+                >
+                  <option value="">Selecione</option>
+
+                  {unidades.map((unidade) => (
+                    <option key={unidade.id} value={String(unidade.id)}>
+                      {unidade.sigla}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.unidadeDose && (
+                  <p className="mensagem-erro">
+                    {errors.unidadeDose.message}
+                  </p>
+                )}
+              </div>
 
               <div className="campo-formulario">
                 <label htmlFor="tipo-dosagem">Tipo da dosagem</label>
-                <select
-                  id="tipo-dosagem"
-                  aria-invalid={!!errors.tipoDosagem}
-                  aria-describedby={errors.tipoDosagem ? 'erro-tipoDosagem' : undefined}
-                  className={errors.tipoDosagem ? 'campo-invalido' : ''}
-                  {...register('tipoDosagem')}
-                >
-                  <option value="" disabled>Selecione</option>
-                  <option value="comprimido">Comprimido(s)</option>
-                  <option value="capsula">Cápsula(s)</option>
-                  <option value="ml">mL</option>
-                  <option value="gotas">Gota(s)</option>
-                  <option value="g">g</option>
-                  <option value="outro">Outro</option>
+                <select id="tipo-dosagem" {...register('tipoDosagem')}>
+                  <option value="">Selecione</option>
+
+                  {tiposDosagem.map((tipo) => (
+                    <option key={tipo.id} value={String(tipo.id)}>
+                      {tipo.tipo_dosagem}
+                    </option>
+                  ))}
                 </select>
                 {errors.tipoDosagem && (
                   <p
@@ -259,15 +288,31 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                   </p>
                 )}
                 <div className="campo-formulario">
-                  <label>Unidade de medida</label>
-                  <select {...register('unidadeConcentracao')}>
+                  <label htmlFor="unidade-concentracao">
+                    Unidade de medida
+                  </label>
+
+                  <select
+                    id="unidade-concentracao"
+                    {...register('unidadeConcentracao')}
+                  >
                     <option value="">Selecione</option>
-                    {unidades.map(unidade => (
-                      <option key={unidade.id} value={unidade.id}>
+
+                    {unidades.map((unidade) => (
+                      <option
+                        key={unidade.id}
+                        value={String(unidade.id)}
+                      >
                         {unidade.sigla}
                       </option>
                     ))}
                   </select>
+
+                  {errors.unidadeConcentracao && (
+                    <p className="mensagem-erro">
+                      {errors.unidadeConcentracao.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -287,7 +332,7 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                   />
 
                   <span className="suffix">
-                    em {frequencia || 5} {intervalo === 'hora' ? 'horas' : 'dias'}
+                    em {frequencia || 5} {intervalo === '1' ? 'horas' : 'dias'}
                   </span>
                 </div>
               </div>
@@ -296,16 +341,14 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
             <div className="linha-campos">
               <div className="campo-formulario">
                 <label htmlFor="intervalo">Intervalo de dosagem</label>
-                <select
-                  id="intervalo"
-                  aria-invalid={!!errors.intervalo}
-                  aria-describedby={errors.intervalo ? 'erro-intervalo' : undefined}
-                  className={errors.intervalo ? 'campo-invalido' : ''}
-                  {...register('intervalo')}
-                >
-                  <option value="hora">Hora</option>
-                  <option value="dia">Dia</option>
-                  <option value="semana">Semana</option>
+                <select id="intervalo" {...register('intervalo')}>
+                  <option value="">Selecione</option>
+
+                  {tiposIntervalo.map((tipo) => (
+                    <option key={tipo.id} value={String(tipo.id)}>
+                      {tipo.tipo_intervalo}
+                    </option>
+                  ))}
                 </select>
                 {errors.intervalo && (
                   <p
@@ -345,13 +388,15 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
               Quantidade total do tratamento
             </label>
             <input
-              type="text"
+              type="number"
+              min="0"
+              step="0.01"
               id="quantidade"
               aria-invalid={!!errors.quantidade}
               aria-describedby={errors.quantidade ? 'erro-quantidade' : undefined}
               className={errors.quantidade ? 'campo-invalido' : ''}
               {...register('quantidade')}
-              placeholder="Ex: 350 mL"
+              placeholder="Ex: 30"
             />
             {errors.quantidade && (
               <p

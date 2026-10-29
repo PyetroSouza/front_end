@@ -1,15 +1,14 @@
 import './DashboardPaciente.css'
+import { useEffect, useState } from 'react'
+import { buscarAgendaMedicamentos } from '../services/api.js'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
 import { Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 
-function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento}) {
+function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento }) {
     const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
-    const medicamentosDoPaciente = medicamentos.filter(
-        (medicamento) => medicamento.id_paciente === pacienteSelecionado?.id
-    )
 
     function confirmarExclusao(medicamento) {
         toast.warning(`Excluir ${medicamento.nome}?`, {
@@ -28,7 +27,47 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
             }
         })
     }
+    const [agenda, setAgenda] = useState([])
+    const medicamentosDaAgenda = agenda.map((item) => ({
+        id_medicamento: item.id_medicamento,
+        id_programacao_medicamento: item.id_programacao_medicamento,
+        id_receita_medica: item.id_receita_medica,
+        nome: item.nome_medicamento,
+        quantidade_dose: Number(item.dosagem),
+        proximo_horario: item.horario_programado.slice(11, 16),
+        confirmado: item.confirmado
+    }))
+    const [carregandoAgenda, setCarregandoAgenda] = useState(true)
 
+    useEffect(() => {
+        async function carregarAgenda() {
+            try {
+                const idUsuarioTeste = 2
+                const hoje = new Date()
+
+                const data = [
+                    hoje.getFullYear(),
+                    String(hoje.getMonth() + 1).padStart(2, '0'),
+                    String(hoje.getDate()).padStart(2, '0')
+                ].join('-')
+
+                const medicamentosAPI = await buscarAgendaMedicamentos(
+                    idUsuarioTeste,
+                    data
+                )
+
+                setAgenda(medicamentosAPI)
+                console.log('📅 Agenda recebida da API:', medicamentosAPI)
+            } catch (erro) {
+                console.error('Erro ao carregar agenda:', erro)
+                toast.error('Não foi possível carregar os medicamentos')
+            } finally {
+                setCarregandoAgenda(false)
+            }
+        }
+
+        carregarAgenda()
+    }, [])
     return (
         <div className="dashboard-conteudo">
             <section className="card-boas-vindas-paciente">
@@ -123,7 +162,9 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                             </div>
                         </div>
                         <div className="container-remedios">
-                            {medicamentosDoPaciente.length === 0 ? (
+                            {carregandoAgenda ? (
+                                <p>Carregando medicamentos...</p>
+                            ) : medicamentosDaAgenda.length === 0 ? (
                                 <div className="sem-medicamentos">
                                     <img
                                         src="/assets/remedio.svg"
@@ -146,10 +187,10 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                                     </button>
                                 </div>
                             ) : (
-                                medicamentosDoPaciente.map((medicamento) => (
+                                medicamentosDaAgenda.map((medicamento) => (
                                     <div
                                         className="remedio"
-                                        key={medicamento.id_medicamento}
+                                        key={medicamento.id_programacao_medicamento}
                                     >
                                         <div className="info-esquerda">
                                             <img
@@ -159,12 +200,11 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
 
                                             <div className="nome-quantidade">
                                                 <span>
-                                                    {medicamento.nome} {medicamento.concentracao}{medicamento.sigla}
+                                                    {medicamento.nome}
                                                 </span>
 
                                                 <p>
-                                                    {medicamento.quantidade_dose} {medicamento.tipo_dosagem}
-                                                    {medicamento.quantidade_dose > 1 ? 's' : ''}
+                                                    Dose: {medicamento.quantidade_dose}
                                                 </p>
                                             </div>
                                         </div>
@@ -189,7 +229,7 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                                                 className="botao-excluir"
                                                 aria-label={`Excluir ${medicamento.nome}`}
                                                 title="Excluir medicamento"
-                                                 onClick={() => confirmarExclusao(medicamento)}
+                                                onClick={() => confirmarExclusao(medicamento)}
                                             >
                                                 <Trash2 size={18} strokeWidth={2}> </Trash2>
                                             </button>

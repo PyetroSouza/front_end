@@ -44,3 +44,57 @@ export async function cadastrarMedicamentoAPI(dadosMedicamento) {
 
   return resultado
 }
+
+export async function buscarTiposIntervalo() {
+  const resposta = await fetch(`${API_URL}/tipo_intervalo`)
+
+  if (!resposta.ok) {
+    throw new Error('Erro ao buscar intervalos')
+  }
+
+  const dados = await resposta.json()
+  return dados.response.tipoIntervalo
+}
+
+export async function cadastrarMedicamentoCompleto(payload) {
+  const resposta = await fetch(
+    `${API_URL}/cadastro_medicamento`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }
+  )
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok) {
+    console.error('❌ Erros retornados pela API:', resultado)
+
+    throw new Error(
+      resultado.field?.join(', ') ||
+      resultado.message ||
+      'Não foi possível cadastrar o medicamento'
+    )
+  }
+
+  return resultado
+}
+
+export async function buscarAgendaMedicamentos(idUsuario, data) {
+  const resposta = await fetch(
+    `${API_URL}/agenda_medicamento/${idUsuario}?data=${data}`
+  )
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok) {
+    throw new Error(
+      resultado.message || 'Erro ao carregar a agenda'
+    )
+  }
+
+  return resultado.response.agenda
+}
