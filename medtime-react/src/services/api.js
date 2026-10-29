@@ -98,3 +98,15 @@ export async function buscarAgendaMedicamentos(idUsuario, data) {
 
   return resultado.response.agenda
 }
+
+export async function buscarUsuarios() {
+  const resposta = await fetch(`${API_URL}/usuario`)
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok) {
+    throw new Error(resultado.message || 'Erro ao buscar usuários')
+  }
+
+  return resultado.response.usuario
+}

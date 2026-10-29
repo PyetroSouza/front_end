@@ -1,6 +1,6 @@
 
-import {buscarUnidadesMedida} from './services/api.js'
-import {useEffect} from 'react'
+import { buscarUnidadesMedida } from './services/api.js'
+import { useEffect } from 'react'
 import { useState } from 'react'
 import Inicio from './pages/Inicio.jsx'
 import CadastroIdoso from './pages/CadastroIdoso'
@@ -8,6 +8,7 @@ import Pacientes from './pages/Pacientes.jsx'
 import Cabecalho from './components/Cabecalho.jsx'
 import DashboardPaciente from './pages/DashboardPaciente.jsx'
 import CadastroRemedio from './pages/CadastroRemedio.jsx'
+import { buscarUsuarios } from './services/api.js'
 import { Toaster } from 'sonner'
 import { medicamentos as medicamentosIniciais } from './data/medicamentos'
 import './App.css'
@@ -21,6 +22,22 @@ function App() {
     () => [...medicamentosIniciais]
   )
   const [medicamentoEmEdicao, setMedicamentoEmEdicao] = useState(null)
+  const [pacientes, setPacientes] = useState([])
+
+  useEffect(() => {
+    async function carregarPacientes() {
+      try {
+        const usuarios = await buscarUsuarios()
+
+        setPacientes(usuarios)
+        console.log('👥 Usuários recebidos:', usuarios)
+      } catch (erro) {
+        console.error('Erro ao carregar usuários:', erro)
+      }
+    }
+
+    carregarPacientes()
+  }, [])
 
   function voltarParaInicio() {
     setTelaAtual('inicio')
@@ -83,7 +100,7 @@ function App() {
         console.error('Erro na conexão:', erro.message)
       }
     }
-  
+
     testarAPI()
   }, [])
 
@@ -104,12 +121,12 @@ function App() {
             aoCadastrar={() => setTelaAtual('cadastro')}
             busca={busca}
             setBusca={setBusca}
+            pacientes={pacientes}
             medicamentos={listaMedicamentos}
             abrirDashboard={(paciente) => {
               setPacienteSelecionado(paciente)
-              setTelaAtual("dashboard")
+              setTelaAtual('dashboard')
             }}
-
           />
         )}
 

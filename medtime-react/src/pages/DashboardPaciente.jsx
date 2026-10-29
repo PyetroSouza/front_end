@@ -1,8 +1,8 @@
 import './DashboardPaciente.css'
-import { useEffect, useState } from 'react'
-import { buscarAgendaMedicamentos } from '../services/api.js'
+import { useAgendaMedicamentos } from '../hooks/useAgendaMedicamentos.js'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
+import { calcularIdade } from '../utils/calcularIdade.js'
 import { Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -27,7 +27,10 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
             }
         })
     }
-    const [agenda, setAgenda] = useState([])
+    const { agenda, carregandoAgenda, erroAgenda } = useAgendaMedicamentos(
+        pacienteSelecionado?.id
+    )
+
     const medicamentosDaAgenda = agenda.map((item) => ({
         id_medicamento: item.id_medicamento,
         id_programacao_medicamento: item.id_programacao_medicamento,
@@ -37,37 +40,26 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
         proximo_horario: item.horario_programado.slice(11, 16),
         confirmado: item.confirmado
     }))
-    const [carregandoAgenda, setCarregandoAgenda] = useState(true)
 
-    useEffect(() => {
-        async function carregarAgenda() {
-            try {
-                const idUsuarioTeste = 2
-                const hoje = new Date()
+    const calcularIdade = (dataNascimento) => {
+        if (!dataNascimento) return null
 
-                const data = [
-                    hoje.getFullYear(),
-                    String(hoje.getMonth() + 1).padStart(2, '0'),
-                    String(hoje.getDate()).padStart(2, '0')
-                ].join('-')
+        const nascimento = new Date(dataNascimento)
+        const hoje = new Date()
 
-                const medicamentosAPI = await buscarAgendaMedicamentos(
-                    idUsuarioTeste,
-                    data
-                )
+        let idade = hoje.getFullYear() - nascimento.getUTCFullYear()
 
-                setAgenda(medicamentosAPI)
-                console.log('📅 Agenda recebida da API:', medicamentosAPI)
-            } catch (erro) {
-                console.error('Erro ao carregar agenda:', erro)
-                toast.error('Não foi possível carregar os medicamentos')
-            } finally {
-                setCarregandoAgenda(false)
-            }
-        }
+        const aindaNaoFezAniversario =
+            hoje.getMonth() < nascimento.getUTCMonth() ||
+            (
+                hoje.getMonth() === nascimento.getUTCMonth() &&
+                hoje.getDate() < nascimento.getUTCDate()
+            )
 
-        carregarAgenda()
-    }, [])
+        if (aindaNaoFezAniversario) idade--
+
+        return idade
+    }
     return (
         <div className="dashboard-conteudo">
             <section className="card-boas-vindas-paciente">
@@ -92,7 +84,11 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                         </div>
                         <div className='dados-texto'>
                             <h3 className="nome">{pacienteSelecionado?.nome || "Ana Maria De Jesus"}</h3>
-                            <p className="idade">{pacienteSelecionado?.idade || 78} anos</p>
+                            <p className="idade">
+                                {pacienteSelecionado?.data_nascimento
+                                    ? `${calcularIdade(pacienteSelecionado.data_nascimento)} anos`
+                                    : 'Idade não informada'}
+                            </p>
 
                             <ul className="tags">
                                 {pacienteSelecionado?.condicoes?.map((condicao) => (
@@ -164,6 +160,8 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                         <div className="container-remedios">
                             {carregandoAgenda ? (
                                 <p>Carregando medicamentos...</p>
+                            ) : erroAgenda ? (
+                                <p>Não foi possível carregar a agenda: {erroAgenda}</p>
                             ) : medicamentosDaAgenda.length === 0 ? (
                                 <div className="sem-medicamentos">
                                     <img
