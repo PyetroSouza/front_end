@@ -64,3 +64,9 @@ export const medicamentoSchema = z.object({
 
     descricao: z.string().optional()
 })
+
+export const medicamentoEdicaoSchema = medicamentoSchema.omit({
+    frequencia: true,
+    intervalo: true,
+    horario: true
+})

@@ -11,7 +11,7 @@ export function useAgendaMedicamentos(idUsuario, dataConsulta) {
         let ativo = true
 
         async function carregarAgenda() {
-            if (!idUsuario, dataConsulta) {
+            if (!idUsuario) {
                 setAgenda([])
                 setCarregandoAgenda(false)
                 return
@@ -57,7 +57,7 @@ export function useAgendaMedicamentos(idUsuario, dataConsulta) {
         return () => {
             ativo = false
         }
-    }, [idUsuario])
+    }, [idUsuario, dataConsulta])
 
 
     return { agenda, carregandoAgenda, erroAgenda }

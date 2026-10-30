@@ -1,13 +1,12 @@
 import './DashboardPaciente.css'
+import ListaMedicamentos from '../components/ListaMedicamentos.jsx'
 import { useAgendaMedicamentos } from '../hooks/useAgendaMedicamentos.js'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
-import { calcularIdade } from '../utils/calcularIdade.js'
-import { Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 
-function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento }) {
+function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento, aoVerTodosMedicamentos }) {
     const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
 
     function confirmarExclusao(medicamento) {
@@ -30,6 +29,7 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
     const { agenda, carregandoAgenda, erroAgenda } = useAgendaMedicamentos(
         pacienteSelecionado?.id
     )
+    console.log('📋 Agenda do Dashboard:', agenda)
 
     const medicamentosDaAgenda = agenda.map((item) => ({
         id_medicamento: item.id_medicamento,
@@ -152,90 +152,27 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                                 <img src="/assets/prancheta.svg" alt="prancheta de remédios" />
                                 <span>Próximos Medicamentos</span>
                             </div>
-                            <div className="menu-medicamentos">
-                                <img src="/assets/menu.svg" alt="menu" />
-                                <p>Ver todos medicamentos (em breve)</p>
-                            </div>
+                            <button
+                                type="button"
+                                className="menu-medicamentos botao-ver-todos"
+                                onClick={aoVerTodosMedicamentos}
+                            >
+                                <img src="/assets/menu.svg" alt="" aria-hidden="true" />
+                                Ver todos medicamentos
+                            </button>
                         </div>
-                        <div className="container-remedios">
-                            {carregandoAgenda ? (
-                                <p>Carregando medicamentos...</p>
-                            ) : erroAgenda ? (
-                                <p>Não foi possível carregar a agenda: {erroAgenda}</p>
-                            ) : medicamentosDaAgenda.length === 0 ? (
-                                <div className="sem-medicamentos">
-                                    <img
-                                        src="/assets/remedio.svg"
-                                        alt=""
-                                        aria-hidden="true"
-                                    />
 
-                                    <p>Nenhum medicamento cadastrado</p>
 
-                                    <span>
-                                        Adicione um medicamento para começar
-                                        a acompanhar os horários deste paciente.
-                                    </span>
+                        <ListaMedicamentos
+                            medicamentos={medicamentosDaAgenda}
+                            carregando={carregandoAgenda}
+                            erro={erroAgenda}
+                            aoAdicionar={aoClicarCadastrarRemedio}
+                            aoEditar={aoEditarMedicamento}
+                            aoExcluir={confirmarExclusao}
+                        />
 
-                                    <button
-                                        type="button"
-                                        onClick={aoClicarCadastrarRemedio}
-                                    >
-                                        Adicionar medicamento
-                                    </button>
-                                </div>
-                            ) : (
-                                medicamentosDaAgenda.map((medicamento) => (
-                                    <div
-                                        className="remedio"
-                                        key={medicamento.id_programacao_medicamento}
-                                    >
-                                        <div className="info-esquerda">
-                                            <img
-                                                src="/assets/remedio.svg"
-                                                alt="Símbolo de medicamento"
-                                            />
 
-                                            <div className="nome-quantidade">
-                                                <span>
-                                                    {medicamento.nome}
-                                                </span>
-
-                                                <p>
-                                                    Dose: {medicamento.quantidade_dose}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="tempo-remedio">
-                                            <h1>{medicamento.proximo_horario}</h1>
-                                            <p>Horário previsto</p>
-                                        </div>
-                                        <div className="acoes-medicamento">
-                                            <button
-                                                type="button"
-                                                className="botao-editar"
-                                                aria-label={`Editar ${medicamento.nome}`}
-                                                title="Editar medicamento"
-                                                onClick={() => aoEditarMedicamento(medicamento)}
-                                            >
-                                                <Pencil size={18} strokeWidth={2}> </Pencil>
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="botao-excluir"
-                                                aria-label={`Excluir ${medicamento.nome}`}
-                                                title="Excluir medicamento"
-                                                onClick={() => confirmarExclusao(medicamento)}
-                                            >
-                                                <Trash2 size={18} strokeWidth={2}> </Trash2>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
                     </div>
 
                 </div>

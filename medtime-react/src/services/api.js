@@ -110,3 +110,82 @@ export async function buscarUsuarios() {
 
   return resultado.response.usuario
 }
+
+export async function buscarReceitaMedica(idReceita) {
+  const resposta = await fetch(
+    `${API_URL}/receita_medica/${idReceita}`
+  )
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok) {
+    throw new Error(
+      resultado.message || 'Erro ao buscar receita médica'
+    )
+  }
+
+  return resultado.response.receita_medica[0] ?? null
+}
+export async function atualizarMedicamentoAPI(idMedicamento, dados) {
+  const resposta = await fetch(
+    `${API_URL}/medicamento/${idMedicamento}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dados)
+    }
+  )
+
+  const resultado = await resposta.json()
+  console.log('📨 Resposta completa do PUT:', resultado)
+
+  if (!resposta.ok || resultado.status === false) {
+    throw new Error(
+      resultado.message || 'Erro ao atualizar medicamento'
+    )
+  }
+
+  return resultado
+}
+
+export async function atualizarReceitaMedicaAPI(idReceita, dados) {
+  const resposta = await fetch(`${API_URL}/receita_medica/${idReceita}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dados)
+  })
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok || resultado.status === false) {
+    throw new Error(
+      resultado.message || 'Erro ao atualizar a receita médica'
+    )
+  }
+
+  return resultado
+}
+
+export async function atualizarEstoqueAPI(idEstoque, dados) {
+  const resposta = await fetch(`${API_URL}/estoque/${idEstoque}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dados)
+  })
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok || resultado.status === false) {
+    throw new Error(
+      resultado.message || 'Erro ao atualizar o estoque'
+    )
+  }
+
+  return resultado
+}

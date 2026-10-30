@@ -1,0 +1,165 @@
+
+.todos-medicamentos {
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.todos-voltar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: transparent;
+    color: #1D6FA4;
+    cursor: pointer;
+    margin-bottom: 24px;
+    font-size: 15px;
+}
+
+.todos-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px #00000012;
+    margin-bottom: 24px;
+}
+
+.todos-cabecalho h1 {
+    color: #1E2F4B;
+    font-size: 26px;
+    margin: 0 0 8px;
+}
+
+.todos-cabecalho p {
+    color: #8892B0;
+    margin: 0;
+}
+
+.todos-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.todos-filtro label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1E2F4B;
+    font-weight: 500;
+}
+
+.todos-filtro input {
+    padding: 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font: inherit;
+    color: #1E2F4B;
+}
+
+.todos-filtro input:focus-visible,
+.todos-voltar:focus-visible {
+    outline: 3px solid #1C86BF;
+    outline-offset: 3px;
+}
+
+.todos-lista {
+    background: #F9F9F9;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.todos-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    background: #FFFFFF;
+    border: 1px solid #4EA8D842;
+    border-radius: 10px;
+}
+
+.todos-medicamento-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #1D6FA4;
+}
+
+.todos-medicamento-info h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    overflow-wrap: anywhere;
+}
+
+.todos-medicamento-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #8892B0;
+}
+
+.todos-horario {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.todos-horario strong {
+    font-size: 20px;
+    color: #1E2F4B;
+}
+
+.todos-horario span {
+    font-size: 12px;
+    color: #6B7280;
+}
+
+.todos-vazio {
+    text-align: center;
+    padding: 36px 16px;
+    color: #8892B0;
+}
+
+.todos-vazio h2 {
+    font-size: 18px;
+    color: #1E2F4B;
+}
+
+@media (max-width: 600px) {
+    .todos-medicamentos {
+        padding: 12px;
+    }
+
+    .todos-cabecalho {
+        padding: 20px;
+    }
+
+    .todos-filtro,
+    .todos-filtro input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .todos-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .todos-horario {
+        align-items: flex-start;
+    }
+}

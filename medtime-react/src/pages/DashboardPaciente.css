@@ -293,7 +293,7 @@
 
 .proximos-medicamentos-placeholder {
     width: 880px;
-    min-height: 412px;
+    min-height: 300px;
     height: auto;
     background: #F9F9F9;
     border: 2px solid #98989842;
@@ -304,7 +304,26 @@
     flex-direction: row;
     justify-content: space-between;
     padding-top: 25px;
-    padding-bottom: 43px;
+    padding-bottom: 20px;
+}
+
+.botao-ver-todos {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    opacity: 1;
+    color: #009951;
+    font: inherit;
+    font-size: 14px;
+}
+
+.botao-ver-todos:hover {
+    text-decoration: underline;
+}
+
+.botao-ver-todos:focus-visible {
+    outline: 3px solid #1C86BF;
+    outline-offset: 3px;
 }
 
 .proximos-remedios,
@@ -325,7 +344,7 @@
 
 .menu-medicamentos {
     opacity: 0.65;
-    cursor: not-allowed;
+    cursor: pointer;
 }
 
 .proximos-medicamentos span {

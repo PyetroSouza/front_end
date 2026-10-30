@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { medicamentoSchema } from '../schemas/medicamentoSchema'
+import {
+  medicamentoSchema,
+  medicamentoEdicaoSchema
+} from '../schemas/medicamentoSchema'
 import { prepararMedicamento } from '../services/medicamentoService'
 import { montarPayloadMedicamento } from '../utils/montarPayloadMedicamento'
-import { cadastrarMedicamentoCompleto } from '../services/api'
+import { cadastrarMedicamentoCompleto, buscarReceitaMedica, atualizarMedicamentoAPI, atualizarReceitaMedicaAPI, atualizarEstoqueAPI } from '../services/api'
 import {
   buscarUnidadesMedida,
   buscarTiposDosagem,
@@ -18,17 +21,24 @@ import './CadastroRemedio.css'
 
 function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarMedicamentoLocal, pacienteSelecionado, medicamentoEmEdicao, atualizarMedicamento }) {
   const [imagemMedicamento, setImagemMedicamento] = useState(null)
+  const [imagemAtual, setImagemAtual] = useState(
+    medicamentoEmEdicao?.imagem ?? null
+  )
   const [unidades, setUnidades] = useState([])
   const [tiposDosagem, setTiposDosagem] = useState([])
   const [tiposIntervalo, setTiposIntervalo] = useState([])
+  const [idEstoqueAtual, setIdEstoqueAtual] = useState(null)
   const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isSubmitting }
   } = useForm({
-    resolver: zodResolver(medicamentoSchema),
+    resolver: zodResolver(
+      modoEdicao ? medicamentoEdicaoSchema : medicamentoSchema
+    ),
     mode: 'onTouched',
 
     defaultValues: {
@@ -52,13 +62,11 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
         ? String(medicamentoEmEdicao.id_unidade_medida_embalagem ?? '')
         : '',
 
-      frequencia: medicamentoEmEdicao?.frequencia ?? 5,
+      frequencia: undefined,
 
       tipoMedicamento: medicamentoEmEdicao?.tipoMedicamento ?? 'comprimido',
-      intervalo: medicamentoEmEdicao?.id_tipo_intervalo != null
-        ? String(medicamentoEmEdicao.id_tipo_intervalo)
-        : '',
-      horario: medicamentoEmEdicao?.proximo_horario ?? '08:00',
+      intervalo: '',
+      horario: '',
       quantidade: medicamentoEmEdicao?.quantidade ?? '',
       descricao: medicamentoEmEdicao?.descricao ?? ''
     }
@@ -86,11 +94,58 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
     carregarOpcoes()
   }, [])
 
+  useEffect(() => {
+    async function carregarDadosEdicao() {
+      if (!modoEdicao || !medicamentoEmEdicao?.id_receita_medica) {
+        return
+      }
+
+      try {
+        const receita = await buscarReceitaMedica(
+          medicamentoEmEdicao.id_receita_medica
+        )
+
+        if (!receita) {
+          throw new Error('Receita não encontrada')
+        }
+
+        if (receita.id_usuario !== pacienteSelecionado?.id) {
+          throw new Error('A receita não pertence ao paciente selecionado')
+        }
+
+        setImagemAtual(receita.imagem)
+        setIdEstoqueAtual(receita.id_estoque)
+        reset({
+          nome: receita.nome_medicamento,
+          dose: String(receita.dosagem),
+          tipoDosagem: String(receita.id_tipo_dosagem),
+          unidadeDose: String(receita.id_unidade_medida),
+          concentracao: String(receita.concentracao),
+          unidadeConcentracao: String(receita.id_unidade_medida_embalagem),
+          quantidade: String(receita.quantidade_em_estoque),
+          descricao: receita.descricao ?? '',
+
+          // Ainda não temos os dados reais da programação.
+          frequencia: medicamentoEmEdicao?.frequencia ?? 5,
+          intervalo: medicamentoEmEdicao?.id_tipo_intervalo != null
+            ? String(medicamentoEmEdicao.id_tipo_intervalo)
+            : '',
+          horario: medicamentoEmEdicao?.proximo_horario ?? '08:00'
+        })
+
+      } catch (erro) {
+        console.error('Erro ao carregar edição:', erro)
+        toast.error('Não foi possível carregar os dados da edição')
+      }
+    }
+
+    carregarDadosEdicao()
+  }, [modoEdicao, medicamentoEmEdicao?.id_receita_medica, pacienteSelecionado?.id])
+
   const frequencia = watch('frequencia')
   const intervalo = watch('intervalo')
 
   async function adicionarMedicamento(dados) {
-    console.log('✅ Formulário válido!', dados)
 
     if (!pacienteSelecionado) {
       toast.error('Nenhum paciente selecionado.')
@@ -111,21 +166,63 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
       })
 
       if (modoEdicao) {
-        atualizarMedicamento(medicamentoPreparado)
-        toast.success('Medicamento atualizado com sucesso!')
-      } else {
-        const idUsuarioTeste = 2
-
-        const payload = montarPayloadMedicamento(
-          medicamentoPreparado,
-          idUsuarioTeste
+        if (!idEstoqueAtual) {
+          toast.error('Os dados da receita ainda não foram carregados.')
+          return
+        }
+        const dadosAtualizados = {
+          nome: medicamentoPreparado.nome,
+          imagem: imagemMedicamento
+            ? medicamentoPreparado.imagem
+            : imagemAtual,
+          concentracao: medicamentoPreparado.concentracao,
+          id_unidade_medida_embalagem:
+            medicamentoPreparado.id_unidade_medida_embalagem,
+          id_tipo_dosagem: medicamentoPreparado.id_tipo_dosagem,
+          id_usuario: pacienteSelecionado.id
+        }
+        if (!dadosAtualizados.imagem) {
+          toast.error('A imagem do medicamento não foi carregada.')
+          return
+        }
+        const resultado = await atualizarMedicamentoAPI(
+          medicamentoEmEdicao.id_medicamento,
+          dadosAtualizados
+        )
+        const dadosReceitaAtualizados = {
+          id_usuario: pacienteSelecionado.id,
+          id_medicamento: medicamentoEmEdicao.id_medicamento,
+          dosagem: Number(dados.dose),
+          id_unidade_medida: Number(dados.unidadeDose),
+          id_estoque: idEstoqueAtual,
+          descricao: dados.descricao || null
+        }
+        const resultadoReceita = await atualizarReceitaMedicaAPI(
+          medicamentoEmEdicao.id_receita_medica,
+          dadosReceitaAtualizados
         )
 
-        console.log('📦 Payload enviado:', payload)
+        const dadosEstoqueAtualizados = {
+          quantidade_em_estoque: Number(dados.quantidade),
+          id_usuarios: pacienteSelecionado.id,
+          id_medicamentos: medicamentoEmEdicao.id_medicamento
+        }
+
+        const resultadoEstoque = await atualizarEstoqueAPI(
+          idEstoqueAtual,
+          dadosEstoqueAtualizados
+        )
+
+        toast.success('Dados do medicamento atualizados!')
+      }
+      else {
+        const payload = montarPayloadMedicamento(
+          medicamentoPreparado,
+          pacienteSelecionado.id
+        )
 
         const resultado = await cadastrarMedicamentoCompleto(payload)
 
-        console.log('✅ Resposta da API:', resultado)
 
         cadastrarMedicamentoLocal(medicamentoPreparado)
 
@@ -144,7 +241,6 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
   }
 
   function formularioInvalido(erros) {
-    console.log('❌ Erros de validação:', erros)
     const primeiroErro = Object.values(erros)[0]
 
     if (primeiroErro) {
@@ -174,10 +270,8 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
 
           <AnexarImagem
             aoSelecionarImagem={setImagemMedicamento}
-            imagemInicial={medicamentoEmEdicao?.imagem}
+            imagemInicial={imagemAtual}
           />
-
-
           <div className="formulario-esquerdo">
 
             <div className="campo-formulario">
@@ -316,99 +410,139 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                 </div>
               </div>
 
-              <div className="campo-formulario">
-                <label htmlFor="frequencia">Frequência</label>
+              {!modoEdicao && (
+                <div className="campo-formulario">
+                  <label htmlFor="frequencia">Frequência</label>
 
-                <div className="input-container">
-                  <span className="prefix">De</span>
+                  <div className="input-container">
+                    <span className="prefix">De</span>
+
+                    <input
+                      type="number"
+                      id="frequencia"
+                      min="1"
+                      max={intervalo === '1' ? 24 : undefined}
+                      placeholder="5"
+                      {...register('frequencia', { valueAsNumber: true })}
+                    />
+
+                    <span className="suffix">
+                      em {frequencia || '—'} {
+                        intervalo === '1'
+                          ? 'hora(s)'
+                          : intervalo === '2'
+                            ? 'dia(s)'
+                            : '—'
+                      }
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {!modoEdicao && (
+              <div className="linha-campos">
+                <div className="campo-formulario">
+                  <label htmlFor="intervalo">
+                    Intervalo de dosagem
+                  </label>
+
+                  <select id="intervalo" {...register('intervalo')}>
+                    <option value="">Selecione</option>
+
+                    {tiposIntervalo.map((tipo) => (
+                      <option key={tipo.id} value={String(tipo.id)}>
+                        {tipo.tipo_intervalo}
+                      </option>
+                    ))}
+                  </select>
+
+                  {errors.intervalo && (
+                    <p
+                      id="erro-intervalo"
+                      className="mensagem-erro"
+                    >
+                      {errors.intervalo.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="campo-formulario">
+                  <label htmlFor="horario">
+                    Horário de tomada inicial
+                  </label>
 
                   <input
-                    type="number"
-                    id="frequencia"
-                    min="1"
-                    max={intervalo === 'hora' ? 24 : undefined}
-                    placeholder="5"
-                    {...register('frequencia', { valueAsNumber: true })}
+                    type="time"
+                    id="horario"
+                    aria-invalid={!!errors.horario}
+                    aria-describedby={
+                      errors.horario ? 'erro-horario' : undefined
+                    }
+                    className={
+                      errors.horario ? 'campo-invalido' : ''
+                    }
+                    {...register('horario')}
                   />
 
-                  <span className="suffix">
-                    em {frequencia || 5} {intervalo === '1' ? 'horas' : 'dias'}
-                  </span>
+                  {errors.horario && (
+                    <p
+                      id="erro-horario"
+                      className="mensagem-erro"
+                    >
+                      {errors.horario.message}
+                    </p>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="linha-campos">
-              <div className="campo-formulario">
-                <label htmlFor="intervalo">Intervalo de dosagem</label>
-                <select id="intervalo" {...register('intervalo')}>
-                  <option value="">Selecione</option>
-
-                  {tiposIntervalo.map((tipo) => (
-                    <option key={tipo.id} value={String(tipo.id)}>
-                      {tipo.tipo_intervalo}
-                    </option>
-                  ))}
-                </select>
-                {errors.intervalo && (
-                  <p
-                    id="erro-intervalo"
-                    className="mensagem-erro">
-                    {errors.intervalo.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="campo-formulario">
-                <label htmlFor="horario">Horário de tomada inicial</label>
-                <input
-                  type="time"
-                  id="horario"
-                  aria-invalid={!!errors.horario}
-                  aria-describedby={errors.horario ? 'erro-horario' : undefined}
-                  className={errors.horario ? 'campo-invalido' : ''}
-                  {...register('horario')}
-                />
-                {errors.horario && (
-                  <p
-                    id="erro-horario"
-                    className="mensagem-erro">
-                    {errors.horario.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
+            {modoEdicao && (
+              <p className="aviso-edicao-programacao">
+                A alteração da frequência e dos horários será
+                disponibilizada em uma próxima atualização.
+              </p>
+            )}
           </div>
         </div>
-        <div className="campos-inferiores">
 
+        <div className="campos-inferiores">
           <div className="campo-formulario">
             <label htmlFor="quantidade">
               Quantidade total do tratamento
             </label>
+
             <input
               type="number"
               min="0"
               step="0.01"
               id="quantidade"
               aria-invalid={!!errors.quantidade}
-              aria-describedby={errors.quantidade ? 'erro-quantidade' : undefined}
-              className={errors.quantidade ? 'campo-invalido' : ''}
+              aria-describedby={
+                errors.quantidade ? 'erro-quantidade' : undefined
+              }
+              className={
+                errors.quantidade ? 'campo-invalido' : ''
+              }
               {...register('quantidade')}
               placeholder="Ex: 30"
             />
+
             {errors.quantidade && (
               <p
                 id="erro-quantidade"
-                className="mensagem-erro">
+                className="mensagem-erro"
+              >
                 {errors.quantidade.message}
               </p>
             )}
           </div>
 
           <div className="campo-formulario">
-            <label htmlFor="descricao">Descrição (opcional)</label>
+            <label htmlFor="descricao">
+              Descrição (opcional)
+            </label>
+
             <textarea
               id="descricao"
               {...register('descricao')}
@@ -421,7 +555,8 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
             <button
               type="submit"
               className="botao-adicionar-medicamento"
-              disabled={isSubmitting}>
+              disabled={isSubmitting}
+            >
               {isSubmitting
                 ? 'Salvando...'
                 : modoEdicao
@@ -430,12 +565,11 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
               }
             </button>
           </div>
-
         </div>
       </form>
     </div>
-
   )
 }
+
 
 export default CadastroRemedio
