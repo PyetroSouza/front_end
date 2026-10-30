@@ -71,6 +71,11 @@
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+.botao-adicionar:disabled,
+.botao-cadastrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 @media (max-width: 480px) {
   .card-boas-vindas {
     height: auto;

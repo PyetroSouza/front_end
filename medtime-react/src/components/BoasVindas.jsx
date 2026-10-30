@@ -1,7 +1,7 @@
 
 import './BoasVindas.css'
 
-function BoasVindas({ aoCadastrar }) {
+function BoasVindas() {
   return (
     <section className="card-boas-vindas">
       <div className="texto-boas-vindas">
@@ -12,8 +12,9 @@ function BoasVindas({ aoCadastrar }) {
       <div className="botoes-idoso">
         <button
           type="button"
+          disabled
+          title="Funcionalidade em desenvolvimento"
           className="botao-adicionar"
-          onClick={aoCadastrar}
         >
           <img src="/assets/adicionar.svg" alt="" />
           <span>Adicionar um idoso</span>
@@ -21,8 +22,9 @@ function BoasVindas({ aoCadastrar }) {
 
         <button
           type="button"
+          disabled
+          title="Funcionalidade em desenvolvimento"
           className="botao-cadastrar"
-          onClick={aoCadastrar}
         >
           <img src="/assets/cadastrar.svg" alt="" />
           <span>Cadastrar um idoso</span>

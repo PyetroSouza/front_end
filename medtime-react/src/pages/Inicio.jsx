@@ -2,8 +2,6 @@
 import BoasVindas from '../components/BoasVindas.jsx'
 import Buscar from '../components/Buscar.jsx'
 import CardPaciente from '../components/CardPaciente.jsx'
-import { gerarIniciais } from '../utils/gerarIniciais.js'
-import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
 import './Inicio.css'
 
 function Inicio({
@@ -11,7 +9,6 @@ function Inicio({
   busca,
   setBusca,
   abrirDashboard,
-  medicamentos,
   pacientes
 }) {
 
