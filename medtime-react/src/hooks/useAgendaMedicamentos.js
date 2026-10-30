@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { buscarAgendaMedicamentos } from '../services/api.js'
 
 export function useAgendaMedicamentos(idUsuario, dataConsulta) {
@@ -7,58 +7,49 @@ export function useAgendaMedicamentos(idUsuario, dataConsulta) {
     const [carregandoAgenda, setCarregandoAgenda] = useState(true)
     const [erroAgenda, setErroAgenda] = useState(null)
 
-    useEffect(() => {
-        let ativo = true
-
-        async function carregarAgenda() {
-            if (!idUsuario) {
-                setAgenda([])
-                setCarregandoAgenda(false)
-                return
-            }
-
-            setCarregandoAgenda(true)
+    const carregarAgenda = useCallback(async () => {
+        if (!idUsuario) {
             setAgenda([])
-            setErroAgenda(null)
-
-            try {
-                const hoje = new Date()
-
-                const data = [
-                    hoje.getFullYear(),
-                    String(hoje.getMonth() + 1).padStart(2, '0'),
-                    String(hoje.getDate()).padStart(2, '0')
-                ].join('-')
-
-                const dataAgenda = dataConsulta || data
-
-                const medicamentosAPI = await buscarAgendaMedicamentos(
-                    idUsuario,
-                    dataAgenda
-                )
-
-                if (ativo) {
-                    setAgenda(medicamentosAPI)
-                }
-            } catch (erro) {
-                if (ativo) {
-                    console.error('Erro ao carregar agenda:', erro)
-                    setErroAgenda(erro.message)
-                }
-            } finally {
-                if (ativo) {
-                    setCarregandoAgenda(false)
-                }
-            }
+            setCarregandoAgenda(false)
+            return
         }
 
-        carregarAgenda()
+        setCarregandoAgenda(true)
+        setErroAgenda(null)
 
-        return () => {
-            ativo = false
+        try {
+            const hoje = new Date()
+
+            const data = [
+                hoje.getFullYear(),
+                String(hoje.getMonth() + 1).padStart(2, '0'),
+                String(hoje.getDate()).padStart(2, '0')
+            ].join('-')
+
+            const dataAgenda = dataConsulta || data
+
+            const medicamentosAPI = await buscarAgendaMedicamentos(
+                idUsuario,
+                dataAgenda
+            )
+
+            setAgenda(medicamentosAPI)
+        } catch (erro) {
+            console.error('Erro ao carregar agenda:', erro)
+            setErroAgenda(erro.message)
+        } finally {
+            setCarregandoAgenda(false)
         }
     }, [idUsuario, dataConsulta])
 
+    useEffect(() => {
+        carregarAgenda()
+    }, [carregarAgenda])
 
-    return { agenda, carregandoAgenda, erroAgenda }
+    return {
+        agenda,
+        carregandoAgenda,
+        erroAgenda,
+        recarregarAgenda: carregarAgenda
+    }
 }

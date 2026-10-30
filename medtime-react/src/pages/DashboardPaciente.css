@@ -377,6 +377,7 @@
 .remedio {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     width: 830px;
@@ -555,6 +556,48 @@
     outline: 3px solid #1C86BF;
     outline-offset: 3px;
 }
+
+.cabecalho-medicamento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    min-width: 0;
+    gap: 16px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .confirmacao-tomada {
+    flex-basis: 100%;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .botao-confirmar-tomada {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #009951;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .botao-confirmar-tomada:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .tomada-confirmada {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #009951;
+  }
 
 @media (max-width: 1024px) {
     .dashboard-inferior-grid {

@@ -3,21 +3,35 @@ import ListaMedicamentos from '../components/ListaMedicamentos.jsx'
 import { useAgendaMedicamentos } from '../hooks/useAgendaMedicamentos.js'
 import { gerarIniciais } from '../utils/gerarIniciais.js'
 import { gerarCorAvatar } from '../utils/gerarCorAvatar.js'
+import { excluirMedicamentoCompleto } from '../services/api.js'
 import { toast } from 'sonner'
 
 
 function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCadastrarRemedio, medicamentos, excluirMedicamento, aoEditarMedicamento, aoVerTodosMedicamentos }) {
     const corAvatar = gerarCorAvatar(pacienteSelecionado?.nome)
 
+
     function confirmarExclusao(medicamento) {
         toast.warning(`Excluir ${medicamento.nome}?`, {
-            description: 'Essa ação removerá o medicamento da lista.',
+            description:
+                'O medicamento e suas programações serão removidos. O histórico de tomadas será preservado.',
             duration: 10000,
             action: {
                 label: 'Excluir',
-                onClick: () => {
-                    excluirMedicamento(medicamento.id_medicamento)
-                    toast.success('Medicamento excluído com sucesso!')
+                onClick: async () => {
+                    try {
+                        await excluirMedicamentoCompleto(
+                            medicamento.id_receita_medica,
+                            pacienteSelecionado.id
+                        )
+
+                        toast.success('Medicamento excluído com sucesso!')
+                        await recarregarAgenda()
+                    } catch (erro) {
+                        toast.error('Não foi possível excluir o medicamento.', {
+                            description: erro.message
+                        })
+                    }
                 }
             },
             cancel: {
@@ -26,10 +40,17 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
             }
         })
     }
-    const { agenda, carregandoAgenda, erroAgenda } = useAgendaMedicamentos(
-        pacienteSelecionado?.id
-    )
+
+
+    const {
+        agenda,
+        carregandoAgenda,
+        erroAgenda,
+        recarregarAgenda
+    } = useAgendaMedicamentos(pacienteSelecionado?.id)
+
     console.log('📋 Agenda do Dashboard:', agenda)
+
 
     const medicamentosDaAgenda = agenda.map((item) => ({
         id_medicamento: item.id_medicamento,
@@ -37,9 +58,17 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
         id_receita_medica: item.id_receita_medica,
         nome: item.nome_medicamento,
         quantidade_dose: Number(item.dosagem),
+
+
+        horario_programado: item.horario_programado,
+
+
         proximo_horario: item.horario_programado.slice(11, 16),
+
+
         confirmado: item.confirmado
     }))
+
 
     const calcularIdade = (dataNascimento) => {
         if (!dataNascimento) return null
@@ -162,7 +191,6 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                             </button>
                         </div>
 
-
                         <ListaMedicamentos
                             medicamentos={medicamentosDaAgenda}
                             carregando={carregandoAgenda}
@@ -170,6 +198,8 @@ function DashboardPaciente({ pacienteSelecionado, voltarParaInicio, aoClicarCada
                             aoAdicionar={aoClicarCadastrarRemedio}
                             aoEditar={aoEditarMedicamento}
                             aoExcluir={confirmarExclusao}
+                            idUsuario={pacienteSelecionado.id}
+                            aoConfirmarTomada={recarregarAgenda}
                         />
 
 

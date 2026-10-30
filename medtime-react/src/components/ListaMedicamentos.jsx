@@ -7,7 +7,9 @@ function ListaMedicamentos({
     erro,
     aoAdicionar,
     aoEditar,
-    aoExcluir
+    aoExcluir,
+    idUsuario,
+    aoConfirmarTomada
 }) {
     return (
         <div className="container-remedios">
@@ -42,8 +44,10 @@ function ListaMedicamentos({
                     <CardMedicamento
                         key={`${medicamento.id_programacao_medicamento}-${medicamento.proximo_horario}`}
                         medicamento={medicamento}
+                        idUsuario={idUsuario}
                         aoEditar={aoEditar}
                         aoExcluir={aoExcluir}
+                        aoConfirmarTomada={aoConfirmarTomada}
                     />
                 ))
             )}

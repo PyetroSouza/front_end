@@ -189,3 +189,103 @@ export async function atualizarEstoqueAPI(idEstoque, dados) {
 
   return resultado
 }
+
+export async function buscarProgramacaoPorReceita(idReceitaMedica) {
+  const resposta = await fetch(
+    `http://localhost:8080/v1/healthSystem/medtime/programacao_medicamento/${idReceitaMedica}`
+  )
+
+  const dados = await resposta.json()
+
+  if (!resposta.ok || !dados.status) {
+    throw new Error(dados.message || 'Erro ao buscar programação')
+  }
+
+  return dados.response?.programacao_medicamento ?? []
+}
+
+export async function editarMedicamentoCompleto(
+  idReceitaMedica,
+  idUsuario,
+  payload
+) {
+  const resposta = await fetch(
+    `http://localhost:8080/v1/healthSystem/medtime/editar_medicamento/${idReceitaMedica}/${idUsuario}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }
+  )
+
+  const dados = await resposta.json()
+
+  if (!resposta.ok || !dados.status) {
+    throw new Error(dados.message || 'Erro ao editar medicamento')
+  }
+
+  return dados
+}
+
+export async function confirmarIngestaoMedicamento(
+  idReceitaMedica,
+  idUsuario,
+  horarioProgramado
+) {
+  const resposta = await fetch(
+    `http://localhost:8080/v1/healthSystem/medtime/historico_medicamento/confirmar_ingestao/${idReceitaMedica}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id_usuario: idUsuario,
+        horario_programado: horarioProgramado
+      })
+    }
+  )
+
+  const resultado = await resposta.json()
+
+  if (!resposta.ok || !resultado.status) {
+    const campo = resultado.field?.join(', ')
+
+    throw new Error(
+      campo
+        ? `${resultado.message} (${campo})`
+        : resultado.message || 'Não foi possível confirmar a tomada.'
+    )
+  }
+
+  return resultado
+}
+
+export async function excluirMedicamentoCompleto(
+  idReceitaMedica,
+  idUsuario
+) {
+  const resposta = await fetch(
+    `http://localhost:8080/v1/healthSystem/medtime/excluir_medicamento/${idReceitaMedica}/${idUsuario}`,
+    {
+      method: 'DELETE'
+    }
+  )
+
+  // HTTP 204 não possui corpo JSON.
+  if (resposta.status === 204) {
+    return true
+  }
+
+  const resultado = await resposta.json().catch(() => null)
+
+  if (!resposta.ok || resultado?.status === false) {
+    throw new Error(
+      resultado?.message || 'Não foi possível excluir o medicamento.'
+    )
+  }
+
+  return true
+}

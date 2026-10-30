@@ -7,7 +7,12 @@ import {
 } from '../schemas/medicamentoSchema'
 import { prepararMedicamento } from '../services/medicamentoService'
 import { montarPayloadMedicamento } from '../utils/montarPayloadMedicamento'
-import { cadastrarMedicamentoCompleto, buscarReceitaMedica, atualizarMedicamentoAPI, atualizarReceitaMedicaAPI, atualizarEstoqueAPI } from '../services/api'
+import {
+  cadastrarMedicamentoCompleto,
+  buscarReceitaMedica,
+  buscarProgramacaoPorReceita,
+  editarMedicamentoCompleto
+} from '../services/api'
 import {
   buscarUnidadesMedida,
   buscarTiposDosagem,
@@ -28,12 +33,14 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
   const [tiposDosagem, setTiposDosagem] = useState([])
   const [tiposIntervalo, setTiposIntervalo] = useState([])
   const [idEstoqueAtual, setIdEstoqueAtual] = useState(null)
+  const [alterarProgramacao, setAlterarProgramacao] = useState(false)
   const modoEdicao = Boolean(medicamentoEmEdicao)
   const {
     register,
     handleSubmit,
     watch,
     reset,
+    getValues,
     formState: { errors, isSubmitting }
   } = useForm({
     resolver: zodResolver(
@@ -101,9 +108,18 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
       }
 
       try {
-        const receita = await buscarReceitaMedica(
-          medicamentoEmEdicao.id_receita_medica
+        const [receita, programacoes] = await Promise.all([
+          buscarReceitaMedica(medicamentoEmEdicao.id_receita_medica),
+          buscarProgramacaoPorReceita(medicamentoEmEdicao.id_receita_medica)
+        ])
+
+        const programacaoAtiva = programacoes.find(
+          (programacao) => programacao.data_hora_fim == null
         )
+
+        if (!programacaoAtiva) {
+          throw new Error('Programação ativa não encontrada')
+        }
 
         if (!receita) {
           throw new Error('Receita não encontrada')
@@ -124,13 +140,9 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
           unidadeConcentracao: String(receita.id_unidade_medida_embalagem),
           quantidade: String(receita.quantidade_em_estoque),
           descricao: receita.descricao ?? '',
-
-          // Ainda não temos os dados reais da programação.
-          frequencia: medicamentoEmEdicao?.frequencia ?? 5,
-          intervalo: medicamentoEmEdicao?.id_tipo_intervalo != null
-            ? String(medicamentoEmEdicao.id_tipo_intervalo)
-            : '',
-          horario: medicamentoEmEdicao?.proximo_horario ?? '08:00'
+          frequencia: Number(programacaoAtiva.frequencia),
+          intervalo: String(programacaoAtiva.id_tipo_intervalo),
+          horario: ''
         })
 
       } catch (erro) {
@@ -165,57 +177,87 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
         medicamentoEmEdicao
       })
 
+
       if (modoEdicao) {
         if (!idEstoqueAtual) {
           toast.error('Os dados da receita ainda não foram carregados.')
           return
         }
-        const dadosAtualizados = {
-          nome: medicamentoPreparado.nome,
-          imagem: imagemMedicamento
-            ? medicamentoPreparado.imagem
-            : imagemAtual,
-          concentracao: medicamentoPreparado.concentracao,
-          id_unidade_medida_embalagem:
-            medicamentoPreparado.id_unidade_medida_embalagem,
-          id_tipo_dosagem: medicamentoPreparado.id_tipo_dosagem,
-          id_usuario: pacienteSelecionado.id
-        }
-        if (!dadosAtualizados.imagem) {
+
+        const imagemFinal = imagemMedicamento
+          ? medicamentoPreparado.imagem
+          : imagemAtual
+
+        if (!imagemFinal) {
           toast.error('A imagem do medicamento não foi carregada.')
           return
         }
-        const resultado = await atualizarMedicamentoAPI(
-          medicamentoEmEdicao.id_medicamento,
-          dadosAtualizados
-        )
-        const dadosReceitaAtualizados = {
-          id_usuario: pacienteSelecionado.id,
-          id_medicamento: medicamentoEmEdicao.id_medicamento,
-          dosagem: Number(dados.dose),
-          id_unidade_medida: Number(dados.unidadeDose),
-          id_estoque: idEstoqueAtual,
-          descricao: dados.descricao || null
+
+        const payload = {
+          medicamento: {
+            nome: medicamentoPreparado.nome,
+            imagem: imagemFinal,
+            concentracao: medicamentoPreparado.concentracao,
+            id_unidade_medida_embalagem:
+              medicamentoPreparado.id_unidade_medida_embalagem,
+            id_tipo_dosagem: medicamentoPreparado.id_tipo_dosagem
+          },
+
+          receita_medica: {
+            dosagem: Number(dados.dose),
+            id_unidade_medida: Number(dados.unidadeDose),
+            descricao: dados.descricao || null
+          },
+
+          estoque: {
+            quantidade_em_estoque: Number(dados.quantidade)
+          }
         }
-        const resultadoReceita = await atualizarReceitaMedicaAPI(
+
+
+        if (alterarProgramacao) {
+          const {
+            frequencia,
+            intervalo,
+            horario
+          } = getValues()
+
+          const frequenciaNumero = Number(frequencia)
+          const intervaloNumero = Number(intervalo)
+          const dataInicio = new Date(horario)
+
+          if (
+            !Number.isInteger(frequenciaNumero) ||
+            frequenciaNumero <= 0 ||
+            ![1, 2].includes(intervaloNumero) ||
+            !horario ||
+            Number.isNaN(dataInicio.getTime()) ||
+            dataInicio <= new Date()
+          ) {
+            toast.error('Verifique os dados da nova programação.')
+            return
+          }
+
+          // O datetime-local fornece YYYY-MM-DDTHH:mm.
+          // Formato local atualmente aceito pelo backend/MySQL.
+          const dataHoraFormatada = new Date(horario).toISOString()
+
+          payload.programacao_medicamento = {
+            frequencia: frequenciaNumero,
+            id_tipo_intervalo: intervaloNumero,
+            data_hora_inicio: dataHoraFormatada
+          }
+        }
+
+
+        await editarMedicamentoCompleto(
           medicamentoEmEdicao.id_receita_medica,
-          dadosReceitaAtualizados
-        )
-
-        const dadosEstoqueAtualizados = {
-          quantidade_em_estoque: Number(dados.quantidade),
-          id_usuarios: pacienteSelecionado.id,
-          id_medicamentos: medicamentoEmEdicao.id_medicamento
-        }
-
-        const resultadoEstoque = await atualizarEstoqueAPI(
-          idEstoqueAtual,
-          dadosEstoqueAtualizados
+          pacienteSelecionado.id,
+          payload
         )
 
         toast.success('Dados do medicamento atualizados!')
-      }
-      else {
+      } else {
         const payload = montarPayloadMedicamento(
           medicamentoPreparado,
           pacienteSelecionado.id
@@ -410,7 +452,7 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
                 </div>
               </div>
 
-              {!modoEdicao && (
+              {(!modoEdicao || alterarProgramacao) && (
                 <div className="campo-formulario">
                   <label htmlFor="frequencia">Frequência</label>
 
@@ -440,7 +482,7 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
               )}
             </div>
 
-            {!modoEdicao && (
+            {(!modoEdicao || alterarProgramacao) && (
               <div className="linha-campos">
                 <div className="campo-formulario">
                   <label htmlFor="intervalo">
@@ -469,11 +511,13 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
 
                 <div className="campo-formulario">
                   <label htmlFor="horario">
-                    Horário de tomada inicial
+                    {modoEdicao
+                      ? 'Nova data e hora de início'
+                      : 'Horário de tomada inicial'}
                   </label>
 
                   <input
-                    type="time"
+                    type={modoEdicao ? 'datetime-local' : 'time'}
                     id="horario"
                     aria-invalid={!!errors.horario}
                     aria-describedby={
@@ -497,12 +541,27 @@ function CadastroRemedio({ voltarParaDashboard, cadastrarMedicamento: cadastrarM
               </div>
             )}
 
+
             {modoEdicao && (
-              <p className="aviso-edicao-programacao">
-                A alteração da frequência e dos horários será
-                disponibilizada em uma próxima atualização.
-              </p>
+              <div className="aviso-edicao-programacao">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={alterarProgramacao}
+                    onChange={(e) => setAlterarProgramacao(e.target.checked)}
+                  />
+                  Alterar programação do medicamento
+                </label>
+
+                {alterarProgramacao && (
+                  <p>
+                    A nova programação substituirá a atual a partir da
+                    data e hora escolhidas.
+                  </p>
+                )}
+              </div>
             )}
+
           </div>
         </div>
 
